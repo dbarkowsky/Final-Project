@@ -31,47 +31,33 @@ async function loadTiles(){
 
     for (item in apis.products){
         $("#wall").append(` \
-        <div class=\"card col w\" style=\"width: 18rem;\"> \
-            <img src=\"${apis.products[item].image}\" class=\"card-img-top\" alt=\"...\"> \
-            <div class=\"card-body\"> \
-                <h5 class=\"card-title\">${apis.products[item].title}</h5> \
-                <p class=\"card-text\">${apis.products[item].description}</p> \
-                <a href=\"#\" class=\"btn btn-primary\">Add to Cart</a> \
+        <div class="card col mx-auto my-4" style="width: 18rem;"> \
+            <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
+            <div class="card-body"> \
+                <h5 class="card-title">${apis.products[item].title}</h5> \
+                <p class="card-text">${apis.products[item].description}</p> \
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Add to Cart</button> \
             </div> \
         </div>`);
     }
+
+    //attach listener to button
+    $(".btn").bind("click", addToCart);
     
+    console.log("end loadTiles");
 }
-
-//, returns that jsondata
-// function loadAPI(){
-//     let xhttpProducts = new XMLHttpRequest();
-//     xhttpProducts.onreadystatechange = function (){
-//         if(this.readyState == 4 && this.status == 200){
-//             apis.products = JSON.parse(this.responseText);
-//         }
-        
-//     };
-//     xhttpProducts.open("GET", "https://fakestoreapi.com/products", true);
-//     xhttpProducts.send();
-
-//     let xhttpCurrencies = new XMLHttpRequest();
-//     xhttpCurrencies.onreadystatechange = function (){
-//         if(this.readyState == 4 && this.status == 200){
-//             apis.currencies = JSON.parse(this.responseText);
-//         }
-        
-//     };
-//     xhttpCurrencies.open("GET", "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json", true);
-//     xhttpCurrencies.send();
-
-//     console.log(apis.products);
-//     console.log(apis.currencies);
-// }
 
 async function loadAPI(url){
     let response = await fetch(url);
     return await response.json();
+}
+
+function addToCart(){
+    console.log("adding to cart");
+    // var myOffcanvas = document.getElementById("offcanvasRight");
+    // var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
+    //$("#offcanvasRight").css("visibility", "visible", "display", "inline-block")
+    // bsOffcanvas.show();
 }
 
 /*****  LINEAR CODE STARTS HERE *****/
@@ -85,4 +71,6 @@ let cart = [];
 //When document is finished loading, do these things:
 $(document).ready(function (){
     loadTiles();
+
+    
 });
