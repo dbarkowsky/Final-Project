@@ -297,10 +297,25 @@ async function loadAPI(url){
 
 function addToCart(){
     console.log("adding to cart");
-    console.log(`adding item ${this.value} to cart`);
+    console.log(`adding item ${this.value-1} to cart`);
 
-    cart.push(createCartObject(this.value));
+    cart.push(createCartObject(this.value-1));
+    console.log(`current cart: ${cart}`);
     
+    $(".offcanvas-body").append(`<div class="cart-box" id="${cart[cart.length-1].id}"> \ 
+                                    <button type="button" class="cart-remove btn-close text-reset" aria-label="Close"></button> \
+                                    <img src="${cart[cart.length-1].image}" alt="..."> \
+                                    <p>${cart[cart.length-1].title}</p> \
+                                    <p>$${cart[cart.length-1].price}</p> \
+                                </div>`);
+
+    $(".cart-remove").bind("click", removeFromCart);
+}
+
+function removeFromCart(){
+    console.log("removing from cart");
+    cart.splice(cart.indexOf(cart[this.id]), 1); //removes all items from cart but shouldn't
+    $(this).closest(".cart-box").remove();
 }
 
 function createCartObject(id){

@@ -1,5 +1,20 @@
-body{
+.card-img-top{
+    width: 15em;
+    align-self: center;
+}
 
+.cart-box{
+    height: fit-content;
+    overflow: hidden;
+}
+
+.cart-box img{
+    height: 50px;
+    display: inline;
+}
+
+.cart-box p{
+    font-size: 1em;
 }
 
 
