@@ -20,6 +20,100 @@ class JSONHolder {
     }
 }
 
+//class that represents the cart and does cart functions
+class Cart {
+    _cartList;
+    _totalPrice;
+
+    constructor(){
+        this._cartList = [];
+        this._totalPrice = 0;
+    }
+
+    get cartList(){
+        return this._cartList;
+    }
+
+    get totalPrice(){
+        return this._totalPrice;
+    }
+
+    set totalPrice(value){
+        this._totalPrice = value;
+    }
+
+    addItem(item){
+        this._cartList.push(item);
+    }
+
+    removeItem(id){
+        for (let i = 0; i < this.cartList.length; i++){
+            if (this.cartList[i].item.id == id){
+                this.cartList.splice(i,1);
+                i--; //because an element has been removed...
+            }
+        }
+    }
+
+    calculateTotal(){
+        let tempTotal = 0;
+        for (x in this._cartList){
+            tempTotal += x.sum;
+        }
+        this.totalPrice = tempTotal.toFixed(2);
+    }
+
+}
+
+//class for each item type in the cart
+class CartEntry {
+    _quantity;
+    _item;
+    _totalPrice;
+
+    constructor(jsonItem){
+        this._quantity = 1;
+        this._item = jsonItem;
+        this._sum = jsonItem.price.toFixed(2); //store price with two decimal places
+    }
+
+    get quantity(){
+        return this._quantity;
+    }
+
+    get item(){
+        return this._item;
+    }
+
+    get id(){
+        return this.item.id;
+    }
+
+    set quantity(quantity){
+        this._quantity = quantity;
+    }
+
+    set item(jsonObject){
+        this._item = jsonObject;
+    }
+
+    get sum(){
+        return this._sum;
+    }
+
+    increaseQuantity() {
+        this._quantity++;
+    }
+
+    decreaseQuantity(){
+        this._quantity--;
+    }
+
+    calculateSum(){
+        this._sum = this._item.price * this._quantity;
+    }
+}
+
 //Waits for API calls, then loads tiles into view
 async function loadTiles(){
     //get api calls
@@ -297,16 +391,18 @@ async function loadAPI(url){
 
 function addToCart(){
     console.log("adding to cart");
-    console.log(`adding item ${this.value-1} to cart`);
+    console.log(`adding item ${this.value} to cart`);
 
-    cart.push(createCartObject(this.value-1));
-    console.log(`current cart: ${cart}`);
+    let tempEntry = new CartEntry(apis.products[this.value-1]);
+    cart.addItem(tempEntry);
+    console.log(`current item: ${tempEntry.id}`);
+    console.log(`current cart: ${cart.cartList}`);
     
-    $(".offcanvas-body").append(`<div class="cart-box" id="${cart[cart.length-1].id}"> \ 
+    $(".offcanvas-body").append(`<div class="cart-box" id="${tempEntry.item.id}"> \ 
                                     <button type="button" class="cart-remove btn-close text-reset" aria-label="Close"></button> \
-                                    <img src="${cart[cart.length-1].image}" alt="..."> \
-                                    <p>${cart[cart.length-1].title}</p> \
-                                    <p>$${cart[cart.length-1].price}</p> \
+                                    <img src="${tempEntry.item.image}" alt="..."> \
+                                    <p>${tempEntry.item.title}</p> \
+                                    <p>$${tempEntry.item.price}</p> \
                                 </div>`);
 
     $(".cart-remove").bind("click", removeFromCart);
@@ -314,8 +410,8 @@ function addToCart(){
 
 function removeFromCart(){
     console.log("removing from cart");
-    cart.splice(cart.indexOf(cart[this.id]), 1); //removes all items from cart but shouldn't
     $(this).closest(".cart-box").remove();
+    cart.removeItem(this.id);
 }
 
 function createCartObject(id){
@@ -329,7 +425,7 @@ function createCartObject(id){
 let apis = new JSONHolder();
 
 //Create shopping cart items
-let cart = [];
+let cart = new Cart();
 
 //When document is finished loading, do these things:
 $(document).ready(function (){
