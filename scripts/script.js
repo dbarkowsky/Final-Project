@@ -42,11 +42,11 @@ class Cart {
         this._totalPrice = value;
     }
 
-    addItem(item){
+    addEntry(item){
         this._cartList.push(item);
     }
 
-    removeItem(id){
+    removeEntry(id){
         for (let i = 0; i < this.cartList.length; i++){
             if (this.cartList[i].item.id == id){
                 this.cartList.splice(i,1);
@@ -57,10 +57,27 @@ class Cart {
 
     calculateTotal(){
         let tempTotal = 0;
-        for (x in this._cartList){
+        for (x in this.cartList){
             tempTotal += x.sum;
         }
         this.totalPrice = tempTotal.toFixed(2);
+    }
+
+    entryExists(tempEntry){
+        for (let entry in this.cartList){
+            if (this.cartList[entry].id == tempEntry.id){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    incrementEntry(id){
+        for (let entry in this.cartList){
+            if (this.cartList[entry].id == id){
+                this.cartList[entry].increaseQuantity();
+            }
+        }
     }
 
 }
@@ -394,24 +411,35 @@ function addToCart(){
     console.log(`adding item ${this.value} to cart`);
 
     let tempEntry = new CartEntry(apis.products[this.value-1]);
-    cart.addItem(tempEntry);
-    console.log(`current item: ${tempEntry.id}`);
-    console.log(`current cart: ${cart.cartList}`);
-    
-    $(".offcanvas-body").append(`<div class="cart-box" id="${tempEntry.item.id}"> \ 
+    //does this item already exist?
+    if (cart.entryExists(tempEntry)){
+        console.log("entry exists");
+        //just increment that entry's quantity by 1
+        cart.incrementEntry(tempEntry.id);
+    } else {
+        console.log("entry is new");
+        cart.addEntry(tempEntry);
+        console.log(`current item: ${tempEntry.id}`);
+
+        $(".offcanvas-body").append(`<div class="cart-box" id="${tempEntry.item.id}"> \ 
                                     <button type="button" class="cart-remove btn-close text-reset" aria-label="Close" id="${tempEntry.item.id}"></button> \
                                     <img src="${tempEntry.item.image}" alt="..."> \
                                     <p>${tempEntry.item.title}</p> \
                                     <p>$${tempEntry.item.price}</p> \
                                 </div>`);
 
-    $(".cart-remove").bind("click", removeFromCart);
+        $(".cart-remove").bind("click", removeFromCart);
+    }
+    
+    console.log(`current cart: ${cart.cartList}`);
+    
+    
 }
 
 function removeFromCart(){
     console.log("removing from cart");
     $(this).closest(".cart-box").remove();
-    cart.removeItem(this.id);
+    cart.removeEntry(this.id);
 }
 
 function createCartObject(id){
