@@ -399,7 +399,7 @@ function addToCart(){
     console.log(`current cart: ${cart.cartList}`);
     
     $(".offcanvas-body").append(`<div class="cart-box" id="${tempEntry.item.id}"> \ 
-                                    <button type="button" class="cart-remove btn-close text-reset" aria-label="Close"></button> \
+                                    <button type="button" class="cart-remove btn-close text-reset" aria-label="Close" id="${tempEntry.item.id}"></button> \
                                     <img src="${tempEntry.item.image}" alt="..."> \
                                     <p>${tempEntry.item.title}</p> \
                                     <p>$${tempEntry.item.price}</p> \
