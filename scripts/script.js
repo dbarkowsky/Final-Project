@@ -76,6 +76,7 @@ class Cart {
         for (let entry in this.cartList){
             if (this.cartList[entry].id == id){
                 this.cartList[entry].increaseQuantity();
+                $(`.cart-box[id="${id}"]`).closest(".quantity").html = `$${this.cartList[entry].sum}`;
             }
         }
     }
@@ -86,7 +87,7 @@ class Cart {
 class CartEntry {
     _quantity;
     _item;
-    _totalPrice;
+    _sum;
 
     constructor(jsonItem){
         this._quantity = 1;
@@ -421,16 +422,10 @@ function addToCart(){
         cart.addEntry(tempEntry);
         console.log(`current item: ${tempEntry.id}`);
 
-        $(".offcanvas-body").append(`<div class="cart-box" id="${tempEntry.item.id}"> \ 
-                                    <button type="button" class="cart-remove btn-close text-reset" aria-label="Close" id="${tempEntry.item.id}"></button> \
-                                    <img src="${tempEntry.item.image}" alt="..."> \
-                                    <p>${tempEntry.item.title}</p> \
-                                    <p>$${tempEntry.item.price}</p> \
-                                </div>`);
 
-        $(".cart-remove").bind("click", removeFromCart);
     }
-    
+
+    drawCart();
     console.log(`current cart: ${cart.cartList}`);
     
     
@@ -445,6 +440,21 @@ function removeFromCart(){
 function createCartObject(id){
     let cartObject = apis.products[id];
     return cartObject;
+}
+
+function drawCart(){
+    $(".offcanvas-body").empty();
+    for (entry in cart.cartList){    
+        $(".offcanvas-body").append(`<div class="cart-box" id="${cart.cartList[entry].id}"> \ 
+                                    <button type="button" class="cart-remove btn-close text-reset" aria-label="Close" id="${cart.cartList[entry].id}"></button> \
+                                    <img src="${cart.cartList[entry].item.image}" alt="..."> \
+                                    <p>${cart.cartList[entry].item.title}</p> \
+                                    <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
+                                    <p>$${cart.cartList[entry].sum}</p> \
+                                </div>`);
+    }
+    //add functions to all buttons
+    $(".cart-remove").bind("click", removeFromCart);
 }
 
 /*****  LINEAR CODE STARTS HERE *****/
