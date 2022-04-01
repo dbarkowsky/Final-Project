@@ -81,6 +81,10 @@ class Cart {
         }
     }
 
+    empty(){
+        this._cartList = [];
+    }
+
 }
 
 //class for each item type in the cart
@@ -391,13 +395,13 @@ async function loadTiles(){
                 <h5 class="card-title">${apis.products[item].title}</h5> \
                 <p class="card-text">$${apis.products[item].price}</p> \
                 <p class="card-text">${apis.products[item].description}</p> \
-                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
+                <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
             </div> \
         </div>`);
     }
 
     //attach listener to button
-    $(".btn").bind("click", addToCart);
+    $(".card-button").bind("click", addToCart);
     
     console.log("end loadTiles");
 }
@@ -457,17 +461,37 @@ function drawCart(){
     $(".cart-remove").bind("click", removeFromCart);
 }
 
+function emptyCart(){
+    $(".offcanvas-body").empty();
+    cart.empty();
+}
+
+function checkout(){
+    //should check if cart is empty first....
+
+    $("#checkout-modal").modal("show");
+}
+
+function closeModal(){
+    $("#checkout-modal").modal("hide");
+}
+
+
 /*****  LINEAR CODE STARTS HERE *****/
 
-//Create objects needed for API calls
+//Create object that holds API calls
 let apis = new JSONHolder();
 
-//Create shopping cart items
+//Create shopping cart object
 let cart = new Cart();
 
 //When document is finished loading, do these things:
 $(document).ready(function (){
     loadTiles();
-
+    //assign listeners to cart buttons
+    $("#cart-empty").bind("click", emptyCart);
+    $("#cart-checkout").bind("click", checkout);
     
+    //assign listeners to modal buttons
+    $(".close-modal").bind("click", closeModal);
 });
