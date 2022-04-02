@@ -411,6 +411,7 @@ async function loadAPI(url){
     return await response.json();
 }
 
+//logical cart functions
 function addToCart(){
     console.log("adding to cart");
     console.log(`adding item ${this.value} to cart`);
@@ -446,6 +447,7 @@ function createCartObject(id){
     return cartObject;
 }
 
+//physical cart functions
 function drawCart(){
     $(".offcanvas-body").empty();
     for (entry in cart.cartList){    
@@ -472,8 +474,52 @@ function checkout(){
     $("#checkout-modal").modal("show");
 }
 
+//modal section functions
 function closeModal(){
     $("#checkout-modal").modal("hide");
+}
+
+//modal prev-next buttons
+function paymentNext(){
+    $("#payment").removeClass("show active");
+    $("#billing").addClass("show active");
+    $("#payment-tab").removeClass("active").attr("selected", "false");
+    $("#billing-tab").addClass("active").attr("selected", "true");
+}
+
+function billingPrev(){
+    $("#billing").removeClass("show active");
+    $("#payment").addClass("show active");
+    $("#billing-tab").removeClass("active").attr("selected", "false");
+    $("#payment-tab").addClass("active").attr("selected", "true");
+}
+
+function billingNext(){
+    $("#billing").removeClass("show active");
+    $("#shipping").addClass("show active");
+    $("#billing-tab").removeClass("active").attr("selected", "false");
+    $("#shipping-tab").addClass("active").attr("selected", "true");
+}
+
+function shippingPrev(){
+    $("#shipping").removeClass("show active");
+    $("#billing").addClass("show active");
+    $("#shipping-tab").removeClass("active").attr("selected", "false");
+    $("#billing-tab").addClass("active").attr("selected", "true");
+}
+
+function shippingNext(){
+    $("#shipping").removeClass("show active");
+    $("#confirm").addClass("show active");
+    $("#shipping-tab").removeClass("active").attr("selected", "false");
+    $("#confirm-tab").addClass("active").attr("selected", "true");
+}
+
+function confirmPrev(){
+    $("#confirm").removeClass("show active");
+    $("#shipping").addClass("show active");
+    $("#confirm-tab").removeClass("active").attr("selected", "false");
+    $("#shipping-tab").addClass("active").attr("selected", "true");
 }
 
 
@@ -494,4 +540,10 @@ $(document).ready(function (){
     
     //assign listeners to modal buttons
     $(".close-modal").bind("click", closeModal);
+    $("#payment-next").bind("click", paymentNext);
+    $("#billing-prev").bind("click", billingPrev);
+    $("#billing-next").bind("click", billingNext);
+    $("#shipping-prev").bind("click", shippingPrev);
+    $("#shipping-next").bind("click", shippingNext);
+    $("#confirm-prev").bind("click", confirmPrev);
 });

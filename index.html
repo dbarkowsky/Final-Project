@@ -64,26 +64,108 @@
 						</ul>
 						<div class="tab-content" id="myTabContent">
 							<div class="tab-pane fade show active" id="payment" role="tabpanel" aria-labelledby="home-tab">
+								<form action="">
+									<div class="row">
+										<div class="form-container col-8">
+											<label class="form-label" for="cc-number">CC Number</label>
+											<input class="form-control" type="text" id="cc-number">
+											<div id="cc-number-feedback">bad</div>
+										</div>
+										<div class="form-container col-4">
+											<label class="form-label" for="cc-cvc">CC cvc</label>
+											<input class="form-control" type="text" id="cc-cvc">
+											<div id="cc-cvc-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<label class="form-label">MM / YY</label>
+									</div>	
+									<div class="row">
+										<div class="form-container col-3">
+											<input class="form-control" type="text" id="cc-month">
+										</div>
+										/
+										<div class="form-container col-3">
+											<input class="form-control" type="text" id="cc-year">
+										</div>
+									</div>
+									<div id="cc-expiry-feedback" class="col-12">bad</div>
+								</form>
 								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary">Next</button>
+									<button type="button" class="btn btn-primary" id="payment-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="profile-tab">
+								<form action="">
+									<div class="row">
+										<div class="form-container col-md-6">
+											<label class="form-label" for="bill-fname">First Name</label>
+											<input class="form-control" type="text" id="bill-fname">
+											<div id="bill-fname-feedback">bad</div>
+										</div>
+										<div class="form-container col-md-6">
+											<label class="form-label" for="bill-lname">Last Name</label>
+											<input class="form-control" type="text" id="bill-lname">
+											<div id="bill-lname-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-container col-3">
+											<label class="form-label" for="bill-apt">Apt/Suite</label>
+											<input class="form-control" type="text" id="bill-apt">
+											<div id="bill-apt-feedback">bad</div>
+										</div>
+										<div class="form-container col-3">
+											<label class="form-label" for="bill-housenumber">House Number</label>
+											<input class="form-control" type="text" id="bill-housenumber">
+											<div id="bill-housenumber-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-container col-9">
+											<label class="form-label" for="bill-street">Street</label>
+											<input class="form-control" type="text" id="bill-street">
+											<div id="bill-street-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-container col-5">
+											<label class="form-label" for="bill-city">City</label>
+											<input class="form-control" type="text" id="bill-city">
+											<div id="bill-city-feedback">bad</div>
+										</div>
+										<div class="form-container col-2">
+											<label class="form-label" for="bill-province">Province/State</label>
+											<input class="form-control" type="text" id="bill-province">
+											<div id="bill-province-feedback">bad</div>
+										</div>
+										<div class="form-container col-3">
+											<label class="form-label" for="bill-country">Country</label>
+											<input class="form-control" type="text" id="bill-country">
+											<div id="bill-country-feedback">bad</div>
+										</div>
+										<div class="form-container col-3">
+											<label class="form-label" for="bill-postal">Postal Code</label>
+											<input class="form-control" type="text" id="bill-postal">
+											<div id="bill-postal-feedback">bad</div>
+										</div>
+									</div>
+								</form>
 								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary">Previous</button>
-									<button type="button" class="btn btn-primary">Next</button>
+									<button type="button" class="btn btn-primary" id="billing-prev">Previous</button>
+									<button type="button" class="btn btn-primary" id="billing-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="contact-tab">
 								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary">Previous</button>
-									<button type="button" class="btn btn-primary">Next</button>
+									<button type="button" class="btn btn-primary" id="shipping-prev">Previous</button>
+									<button type="button" class="btn btn-primary" id="shipping-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="confirm" role="tabpanel" aria-labelledby="contact-tab">
 								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary">Previous</button>
-									<button type="button" class="btn btn-primary">Confirm</button>
+									<button type="button" class="btn btn-primary" id="confirm-prev">Previous</button>
+									<button type="button" class="btn btn-primary" id="confirm-final">Confirm</button>
 								</div>
 							</div>
 						</div>
