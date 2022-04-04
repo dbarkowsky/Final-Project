@@ -571,7 +571,77 @@ function billingNext(){
     let provinceRegex = "^[A-Z]{2}$";
     let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
 
-    //////////////////////////////////add regex checks
+    //check first name field
+    if (!validateField(nameRegex, $("#bill-fname").val())){
+        $("#bill-fname-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-fname-feedback").fadeOut(250);
+    }
+
+    //check last name field
+    if (!validateField(nameRegex, $("#bill-lname").val())){
+        $("#bill-lname-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-lname-feedback").fadeOut(250);
+    }
+
+    //check apt field
+    if (!validateField(aptRegex, $("#bill-apt").val())){
+        $("#bill-apt-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-apt-feedback").fadeOut(250);
+    }
+
+    //check house number field
+    if (!validateField(numberRegex, $("#bill-housenumber").val())){
+        $("#bill-housenumber-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-housenumber-feedback").fadeOut(250);
+    }
+
+    //check street field
+    if (!validateField(wordRegex, $("#bill-street").val())){
+        $("#bill-street-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-street-feedback").fadeOut(250);
+    }
+
+    //check city field
+    if (!validateField(wordRegex, $("#bill-city").val())){
+        $("#bill-city-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-city-feedback").fadeOut(250);
+    }
+
+    //check province field
+    if (!validateField(provinceRegex, $("#bill-province").val().toUpperCase())){
+        $("#bill-province-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-province-feedback").fadeOut(250);
+    }
+    
+    //check country field
+    if (!validateField(wordRegex, $("#bill-country").val())){
+        $("#bill-country-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-country-feedback").fadeOut(250);
+    }
+
+    //check postal field
+    if (!validateField(postalRegex, $("#bill-postal").val().toUpperCase())){
+        $("#bill-postal-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-postal-feedback").fadeOut(250);
+    }
 
     if (verificationPassed){
         $("#billing").removeClass("show active");
@@ -589,13 +659,97 @@ function shippingPrev(){
 }
 
 function shippingNext(){
-    ////////////////////////////////add checks from billing area
 
+    let verificationPassed = true;
+    let nameRegex = "^[A-Za-z\\s-]+[a-z]+";
+    let aptRegex = "^[0-9]*$";
+    let numberRegex = "^[0-9]+[A-Z]*$";
+    let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
+    let provinceRegex = "^[A-Z]{2}$";
+    let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
 
-    $("#shipping").removeClass("show active");
-    $("#confirm").addClass("show active");
-    $("#shipping-tab").removeClass("active").attr("selected", "false");
-    $("#confirm-tab").addClass("active").attr("selected", "true");
+    //if you use the same values as billing, don't validate
+    if (!$("#same-shipping").prop("checked")){
+        //validate as normal
+        //check first name field
+        if (!validateField(nameRegex, $("#ship-fname").val())){
+            $("#ship-fname-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-fname-feedback").fadeOut(250);
+        }
+
+        //check last name field
+        if (!validateField(nameRegex, $("#ship-lname").val())){
+            $("#ship-lname-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-lname-feedback").fadeOut(250);
+        }
+
+        //check apt field
+        if (!validateField(aptRegex, $("#ship-apt").val())){
+            $("#ship-apt-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-apt-feedback").fadeOut(250);
+        }
+
+        //check house number field
+        if (!validateField(numberRegex, $("#ship-housenumber").val())){
+            $("#ship-housenumber-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-housenumber-feedback").fadeOut(250);
+        }
+
+        //check street field
+        if (!validateField(wordRegex, $("#ship-street").val())){
+            $("#ship-street-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-street-feedback").fadeOut(250);
+        }
+
+        //check city field
+        if (!validateField(wordRegex, $("#ship-city").val())){
+            $("#ship-city-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-city-feedback").fadeOut(250);
+        }
+
+        //check province field
+        if (!validateField(provinceRegex, $("#ship-province").val().toUpperCase())){
+            $("#ship-province-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-province-feedback").fadeOut(250);
+        }
+        
+        //check country field
+        if (!validateField(wordRegex, $("#ship-country").val())){
+            $("#ship-country-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-country-feedback").fadeOut(250);
+        }
+
+        //check postal field
+        if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
+            $("#ship-postal-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-postal-feedback").fadeOut(250);
+        }
+    }
+
+    if (verificationPassed){
+        $("#shipping").removeClass("show active");
+        $("#confirm").addClass("show active");
+        $("#shipping-tab").removeClass("active").attr("selected", "false");
+        $("#confirm-tab").addClass("active").attr("selected", "true");
+    }
 }
 
 function confirmPrev(){
@@ -603,6 +757,10 @@ function confirmPrev(){
     $("#shipping").addClass("show active");
     $("#confirm-tab").removeClass("active").attr("selected", "false");
     $("#shipping-tab").addClass("active").attr("selected", "true");
+}
+
+function confirmFinal(){
+    
 }
 
 
@@ -629,4 +787,5 @@ $(document).ready(function (){
     $("#shipping-prev").bind("click", shippingPrev);
     $("#shipping-next").bind("click", shippingNext);
     $("#confirm-prev").bind("click", confirmPrev);
+    $("#confirm-final").bind("click", confirmFinal);
 });
