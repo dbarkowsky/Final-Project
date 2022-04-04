@@ -470,13 +470,25 @@ function emptyCart(){
 
 function checkout(){
     //should check if cart is empty first....
-
+    drawConfirmModal();
     $("#checkout-modal").modal("show");
 }
 
 //modal section functions
 function closeModal(){
     $("#checkout-modal").modal("hide");
+}
+
+function drawConfirmModal(){
+    $("#confirm-content").empty();
+    for (entry in cart.cartList){    
+        $("#confirm-content").append(`<div class="confirm-box" id="confirm-${cart.cartList[entry].id}"> \ 
+                                    <img src="${cart.cartList[entry].item.image}" alt="..."> \
+                                    <p>${cart.cartList[entry].item.title}</p> \
+                                    <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
+                                    <p>$${cart.cartList[entry].sum}</p> \
+                                </div>`);
+    }
 }
 
 //modal prev-next buttons

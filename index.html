@@ -63,7 +63,7 @@
 							</li>
 						</ul>
 						<div class="tab-content" id="myTabContent">
-							<div class="tab-pane fade show active" id="payment" role="tabpanel" aria-labelledby="home-tab">
+							<div class="tab-pane fade show active" id="payment" role="tabpanel" aria-labelledby="payment-tab">
 								<form action="">
 									<div class="row">
 										<div class="form-container col-8">
@@ -95,7 +95,7 @@
 									<button type="button" class="btn btn-primary" id="payment-next">Next</button>
 								</div>
 							</div>
-							<div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="profile-tab">
+							<div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="billing-tab">
 								<form action="">
 									<div class="row">
 										<div class="form-container col-md-6">
@@ -156,13 +156,74 @@
 									<button type="button" class="btn btn-primary" id="billing-next">Next</button>
 								</div>
 							</div>
-							<div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="contact-tab">
+							<div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
+								<form action="">
+									<div class="row">
+										<input id="same-shipping" type="checkbox">
+										<label for="same-shipping">My shipping address matches my billing address.</label>
+									</div>
+									<div class="row">
+										<div class="form-container col-md-6">
+											<label class="form-label" for="ship-fname">First Name</label>
+											<input class="form-control" type="text" id="ship-fname">
+											<div id="ship-fname-feedback">bad</div>
+										</div>
+										<div class="form-container col-md-6">
+											<label class="form-label" for="ship-lname">Last Name</label>
+											<input class="form-control" type="text" id="ship-lname">
+											<div id="ship-lname-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-container col-3">
+											<label class="form-label" for="ship-apt">Apt/Suite</label>
+											<input class="form-control" type="text" id="ship-apt">
+											<div id="ship-apt-feedback">bad</div>
+										</div>
+										<div class="form-container col-3">
+											<label class="form-label" for="ship-housenumber">House Number</label>
+											<input class="form-control" type="text" id="ship-housenumber">
+											<div id="ship-housenumber-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-container col-9">
+											<label class="form-label" for="ship-street">Street</label>
+											<input class="form-control" type="text" id="ship-street">
+											<div id="ship-street-feedback">bad</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-container col-5">
+											<label class="form-label" for="ship-city">City</label>
+											<input class="form-control" type="text" id="ship-city">
+											<div id="ship-city-feedback">bad</div>
+										</div>
+										<div class="form-container col-2">
+											<label class="form-label" for="ship-province">Province/State</label>
+											<input class="form-control" type="text" id="ship-province">
+											<div id="ship-province-feedback">bad</div>
+										</div>
+										<div class="form-container col-3">
+											<label class="form-label" for="ship-country">Country</label>
+											<input class="form-control" type="text" id="ship-country">
+											<div id="ship-country-feedback">bad</div>
+										</div>
+										<div class="form-container col-3">
+											<label class="form-label" for="ship-postal">Postal Code</label>
+											<input class="form-control" type="text" id="ship-postal">
+											<div id="ship-postal-feedback">bad</div>
+										</div>
+									</div>
+								</form>
 								<div class="modal-buttons">
 									<button type="button" class="btn btn-primary" id="shipping-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="shipping-next">Next</button>
 								</div>
 							</div>
-							<div class="tab-pane fade" id="confirm" role="tabpanel" aria-labelledby="contact-tab">
+							<div class="tab-pane fade" id="confirm" role="tabpanel" aria-labelledby="confirm-tab">
+								<div id="confirm-content"></div>
+								<div id="totals"></div>
 								<div class="modal-buttons">
 									<button type="button" class="btn btn-primary" id="confirm-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="confirm-final">Confirm</button>
