@@ -33,7 +33,7 @@
 			<div class="offcanvas-body"></div>
 			<div class="offcanvas-buttons grid">
 				<button class="btn col-6" id="cart-empty">Empty</button>
-				<button class="btn col-6" id="cart-checkout">Checkout</button>
+				<button class="btn col-6" id="cart-checkout" disabled="true">Checkout</button>
 			</div>
 		</div>
 
@@ -69,12 +69,12 @@
 										<div class="form-container col-8">
 											<label class="form-label" for="cc-number">CC Number</label>
 											<input class="form-control" type="text" id="cc-number">
-											<div id="cc-number-feedback">bad</div>
+											<div class="feedback" id="cc-number-feedback">bad</div>
 										</div>
 										<div class="form-container col-4">
 											<label class="form-label" for="cc-cvc">CC cvc</label>
 											<input class="form-control" type="text" id="cc-cvc">
-											<div id="cc-cvc-feedback">bad</div>
+											<div class="feedback" id="cc-cvc-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
@@ -89,7 +89,7 @@
 											<input class="form-control" type="text" id="cc-year">
 										</div>
 									</div>
-									<div id="cc-expiry-feedback" class="col-12">bad</div>
+									<div id="cc-expiry-feedback" class="col-12 feedback">bad</div>
 								</form>
 								<div class="modal-buttons">
 									<button type="button" class="btn btn-primary" id="payment-next">Next</button>
@@ -101,53 +101,53 @@
 										<div class="form-container col-md-6">
 											<label class="form-label" for="bill-fname">First Name</label>
 											<input class="form-control" type="text" id="bill-fname">
-											<div id="bill-fname-feedback">bad</div>
+											<div class="feedback" id="bill-fname-feedback">bad</div>
 										</div>
 										<div class="form-container col-md-6">
 											<label class="form-label" for="bill-lname">Last Name</label>
 											<input class="form-control" type="text" id="bill-lname">
-											<div id="bill-lname-feedback">bad</div>
+											<div class="feedback" id="bill-lname-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="form-container col-3">
 											<label class="form-label" for="bill-apt">Apt/Suite</label>
 											<input class="form-control" type="text" id="bill-apt">
-											<div id="bill-apt-feedback">bad</div>
+											<div class="feedback" id="bill-apt-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="bill-housenumber">House Number</label>
 											<input class="form-control" type="text" id="bill-housenumber">
-											<div id="bill-housenumber-feedback">bad</div>
+											<div class="feedback" id="bill-housenumber-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="form-container col-9">
 											<label class="form-label" for="bill-street">Street</label>
 											<input class="form-control" type="text" id="bill-street">
-											<div id="bill-street-feedback">bad</div>
+											<div class="feedback" id="bill-street-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="form-container col-5">
 											<label class="form-label" for="bill-city">City</label>
 											<input class="form-control" type="text" id="bill-city">
-											<div id="bill-city-feedback">bad</div>
+											<div class="feedback" id="bill-city-feedback">bad</div>
 										</div>
 										<div class="form-container col-2">
 											<label class="form-label" for="bill-province">Province/State</label>
 											<input class="form-control" type="text" id="bill-province">
-											<div id="bill-province-feedback">bad</div>
+											<div class="feedback" id="bill-province-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="bill-country">Country</label>
 											<input class="form-control" type="text" id="bill-country">
-											<div id="bill-country-feedback">bad</div>
+											<div class="feedback" id="bill-country-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="bill-postal">Postal Code</label>
 											<input class="form-control" type="text" id="bill-postal">
-											<div id="bill-postal-feedback">bad</div>
+											<div class="feedback" id="bill-postal-feedback">bad</div>
 										</div>
 									</div>
 								</form>
@@ -166,53 +166,53 @@
 										<div class="form-container col-md-6">
 											<label class="form-label" for="ship-fname">First Name</label>
 											<input class="form-control" type="text" id="ship-fname">
-											<div id="ship-fname-feedback">bad</div>
+											<div class="feedback" id="ship-fname-feedback">bad</div>
 										</div>
 										<div class="form-container col-md-6">
 											<label class="form-label" for="ship-lname">Last Name</label>
 											<input class="form-control" type="text" id="ship-lname">
-											<div id="ship-lname-feedback">bad</div>
+											<div class="feedback" id="ship-lname-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="form-container col-3">
 											<label class="form-label" for="ship-apt">Apt/Suite</label>
 											<input class="form-control" type="text" id="ship-apt">
-											<div id="ship-apt-feedback">bad</div>
+											<div class="feedback" id="ship-apt-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="ship-housenumber">House Number</label>
 											<input class="form-control" type="text" id="ship-housenumber">
-											<div id="ship-housenumber-feedback">bad</div>
+											<div class="feedback" id="ship-housenumber-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="form-container col-9">
 											<label class="form-label" for="ship-street">Street</label>
 											<input class="form-control" type="text" id="ship-street">
-											<div id="ship-street-feedback">bad</div>
+											<div class="feedback" id="ship-street-feedback">bad</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="form-container col-5">
 											<label class="form-label" for="ship-city">City</label>
 											<input class="form-control" type="text" id="ship-city">
-											<div id="ship-city-feedback">bad</div>
+											<div class="feedback" id="ship-city-feedback">bad</div>
 										</div>
 										<div class="form-container col-2">
 											<label class="form-label" for="ship-province">Province/State</label>
 											<input class="form-control" type="text" id="ship-province">
-											<div id="ship-province-feedback">bad</div>
+											<div class="feedback" id="ship-province-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="ship-country">Country</label>
 											<input class="form-control" type="text" id="ship-country">
-											<div id="ship-country-feedback">bad</div>
+											<div class="feedback" id="ship-country-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="ship-postal">Postal Code</label>
 											<input class="form-control" type="text" id="ship-postal">
-											<div id="ship-postal-feedback">bad</div>
+											<div class="feedback" id="ship-postal-feedback">bad</div>
 										</div>
 									</div>
 								</form>

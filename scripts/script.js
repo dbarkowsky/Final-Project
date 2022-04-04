@@ -85,6 +85,14 @@ class Cart {
         this._cartList = [];
     }
 
+    isEmpty(){
+        if (this._cartList.length < 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
 
 //class for each item type in the cart
@@ -382,7 +390,7 @@ async function loadTiles(){
             }
         }
     ];
-    apis.currencies = await loadAPI("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json");
+    apis.currencies = await loadAPI("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/cad.json");
 
     console.log(apis.products);
     console.log(apis.currencies);
@@ -393,7 +401,7 @@ async function loadTiles(){
             <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
             <div class="card-body"> \
                 <h5 class="card-title">${apis.products[item].title}</h5> \
-                <p class="card-text">$${apis.products[item].price}</p> \
+                <p class="card-text">$${apis.products[item].price.toFixed(2)}</p> \
                 <p class="card-text">${apis.products[item].description}</p> \
                 <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
             </div> \
@@ -409,6 +417,19 @@ async function loadTiles(){
 async function loadAPI(url){
     let response = await fetch(url);
     return await response.json();
+}
+
+function validateField(expression, string){
+    expression = new RegExp(expression);
+    string = string.trim();
+    console.log("in validate");
+
+    if(expression.test(string)){
+        console.log(`${string} matches the expression`);
+        return true;
+    }
+    console.log(`${string} doesn't match the expression`);
+    return false;
 }
 
 //logical cart functions
@@ -432,14 +453,17 @@ function addToCart(){
 
     drawCart();
     console.log(`current cart: ${cart.cartList}`);
-    
-    
+    $("#cart-checkout").removeAttr("disabled");
 }
 
 function removeFromCart(){
     console.log("removing from cart");
     $(this).closest(".cart-box").remove();
     cart.removeEntry(this.id);
+    //if cart is empty, disable checkout
+    if (cart.isEmpty()){
+        $("#cart-checkout").attr("disabled", "true");
+    }
 }
 
 function createCartObject(id){
@@ -469,9 +493,8 @@ function emptyCart(){
 }
 
 function checkout(){
-    //should check if cart is empty first....
-    drawConfirmModal();
-    $("#checkout-modal").modal("show");
+        drawConfirmModal();
+        $("#checkout-modal").modal("show");
 }
 
 //modal section functions
@@ -493,10 +516,43 @@ function drawConfirmModal(){
 
 //modal prev-next buttons
 function paymentNext(){
-    $("#payment").removeClass("show active");
-    $("#billing").addClass("show active");
-    $("#payment-tab").removeClass("active").attr("selected", "false");
-    $("#billing-tab").addClass("active").attr("selected", "true");
+    let verificationPassed = true;
+    let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*";
+    let ccCVCRegex = "^[0-9]{3}$";
+    let ccExpiryRegex = "^[0-9]{2}$";
+
+    //If the credit card field is not valid
+    if (!validateField(ccNumberRegex, $("#cc-number").val())){
+        $("#cc-number-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#cc-number-feedback").fadeOut(250);
+    }
+
+    //If the CVC field is not valid
+    if (!validateField(ccCVCRegex, $("#cc-cvc").val())){
+        $("#cc-cvc-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#cc-cvc-feedback").fadeOut(250);
+    }
+
+    //If the Expiry fields are not valid
+    /////////////////////////////////////////////add requirement for this current date or later
+    if (!validateField(ccExpiryRegex, $("#cc-month").val()) || !validateField(ccExpiryRegex, $("#cc-year").val())){
+        $("#cc-expiry-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#cc-expiry-feedback").fadeOut(250);
+    }
+
+
+    if (verificationPassed){
+        $("#payment").removeClass("show active");
+        $("#billing").addClass("show active");
+        $("#payment-tab").removeClass("active").attr("selected", "false");
+        $("#billing-tab").addClass("active").attr("selected", "true");
+    }
 }
 
 function billingPrev(){
@@ -507,10 +563,22 @@ function billingPrev(){
 }
 
 function billingNext(){
-    $("#billing").removeClass("show active");
-    $("#shipping").addClass("show active");
-    $("#billing-tab").removeClass("active").attr("selected", "false");
-    $("#shipping-tab").addClass("active").attr("selected", "true");
+    let verificationPassed = true;
+    let nameRegex = "^[A-Za-z\\s-]+[a-z]+";
+    let aptRegex = "^[0-9]*$";
+    let numberRegex = "^[0-9]+[A-Z]*$";
+    let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
+    let provinceRegex = "^[A-Z]{2}$";
+    let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+
+    //////////////////////////////////add regex checks
+
+    if (verificationPassed){
+        $("#billing").removeClass("show active");
+        $("#shipping").addClass("show active");
+        $("#billing-tab").removeClass("active").attr("selected", "false");
+        $("#shipping-tab").addClass("active").attr("selected", "true");
+    }
 }
 
 function shippingPrev(){
@@ -521,6 +589,9 @@ function shippingPrev(){
 }
 
 function shippingNext(){
+    ////////////////////////////////add checks from billing area
+
+
     $("#shipping").removeClass("show active");
     $("#confirm").addClass("show active");
     $("#shipping-tab").removeClass("active").attr("selected", "false");

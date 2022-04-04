@@ -22,6 +22,10 @@
     display: inline;
 }
 
+.feedback {
+    display: none;
+}
+
 
 /* For desktop screens
 @media only screen and (min-width: 1368px){
