@@ -16,9 +16,14 @@
 
 		<!--Container to hold page elements -->
 		<div id="container" class="container m-auto">
-			<div id="header">
-				<p class="h1">ICS-128 Final Project</p>
-				<p class="h4">Dylan Barkowsky</p>
+			<div id="header row">
+				<div class="col-sm-4">
+					<p class="h1">ICS-128 Final Project</p>
+					<p class="h4">Dylan Barkowsky</p>
+				</div>
+				<div class="col-sm-2">
+					<button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><img class="cart-button" src="./images/cart.jpg" alt=""></button>
+				</div>
 			</div>
 			<!-- Wall div displays product cards-->
 			<div id="wall" class="row row-cols-auto"></div>
@@ -222,6 +227,20 @@
 								</div>
 							</div>
 							<div class="tab-pane fade" id="confirm" role="tabpanel" aria-labelledby="confirm-tab">
+								<form action="">
+									<div class="row">
+										<div class="form-container col-sm-6">
+											<label class="form-label" for="confirm-email">Email</label>
+											<input class="form-control" type="text" id="confirm-email">
+											<div class="feedback" id="confirm-email-feedback">bad</div>
+										</div>
+										<div class="form-container col-sm-6">
+											<label class="form-label" for="confirm-phone">Phone</label>
+											<input class="form-control" type="text" id="confirm-phone">
+											<div class="feedback" id="confirm-phone-feedback">bad</div>
+										</div>
+									</div>
+								</form>
 								<div id="confirm-content"></div>
 								<div id="totals"></div>
 								<div class="modal-buttons">
