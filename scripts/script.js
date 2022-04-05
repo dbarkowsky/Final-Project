@@ -24,6 +24,7 @@ class JSONHolder {
 class Cart {
     _cartList;
     _totalPrice;
+    _orderData
 
     constructor(){
         this._cartList = [];
@@ -38,8 +39,16 @@ class Cart {
         return this._totalPrice;
     }
 
+    get orderData(){
+        return this._orderData;
+    }
+
     set totalPrice(value){
         this._totalPrice = value;
+    }
+
+    set orderData(jsonObject){
+        this._orderData = jsonObject;
     }
 
     addEntry(item){
@@ -255,6 +264,7 @@ function drawCart(){
 function emptyCart(){
     $(".offcanvas-body").empty();
     cart.empty();
+    $("#cart-checkout").attr("disabled", "true");
 }
 
 function checkout(){
@@ -527,7 +537,7 @@ function confirmPrev(){
 function confirmFinal(){
     let verificationPassed = true;
     let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
-    let phoneRegex = "^[0-9]{3}[\\.\\s-][0-9]{3}[\\.\\s-][0-9]{4}$";
+    let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
 
     //check email field
     if (!validateField(emailRegex, $("#confirm-email").val())){
@@ -552,20 +562,70 @@ function confirmFinal(){
 }
 
 async function sendData(){
+    //build object to send
+    cart.orderData = await buildOrderData();
+    console.log(cart.orderData);
     //sending data to server
     await fetch("https://deepblue.camosun.bc.ca/~c0180354/ics128/final/", {
         method: "POST",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(cart.orderData)
     }).then(response => {
         //if post is successful
+        console.log(response);
     }).catch(error => {
         //if post is NOT successful
+        console.log(error);
     });
 }
+
+/* TODO:
+-add currency selector
+-possibly add .trim to all fields.
+-copy billing shipping fields if checkbox:checked
+*/
+function buildOrderData(){
+    let orderData = { 
+        card_number: $("#cc-number").val(),
+        expiry_month: $("#cc-month").val(),
+        expiry_year: $("#cc-year").val(),
+        security_code: $("#cc-cvc").val(),
+        amount: cart.totalPrice,
+        currency: 'three character currency code, lowercase -- example: cad',
+        billing: {
+            first_name: $("#bill-fname").val(),
+            last_name: $("#bill-lname").val(),
+            address_1: $("#bill-housenumber").val(),
+            address_2: $("#bill-apt").val(),
+            city: $("#bill-city").val(),
+            province: $("#bill-province").val(),
+            country: $("#bill-country").val(),
+            postal: $("#bill-postal").val(),
+            phone: $("#confirm-phone").val(),
+            email: $("#confirm-email").val()
+        },
+        shipping: {
+            first_name: $("#ship-fname").val(),
+            last_name: $("#ship-lname").val(),
+            address_1: $("#ship-housenumber").val(),
+            address_2: $("#ship-apt").val(),
+            city: $("#ship-city").val(),
+            province: $("#ship-province").val(),
+            country: $("#ship-country").val(),
+            postal: $("#ship-postal").val()  
+        }
+    }
+
+    return orderData;
+}
+
+/*
+after jquery import
+<script src="url for masonry"></script>
+
+$("thing I hold cards in ").imagesLoaded(() => {
+    let mason = new Masonry($("thig I hold cards in"));
+})
+*/
 
 
 /*****  LINEAR CODE STARTS HERE *****/
@@ -579,8 +639,6 @@ let cart = new Cart();
 //When document is finished loading, do these things:
 $(document).ready(function (){
     loadTiles();
-    //assign listener to main page cart button
-    $(".cart-button").bind("click", openCart);
 
     //assign listeners to cart buttons
     $("#cart-empty").bind("click", emptyCart);
