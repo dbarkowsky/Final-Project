@@ -15,18 +15,25 @@
 	<body>
 
 		<!--Container to hold page elements -->
-		<div id="container" class="container m-auto">
+		<div id="container-fluid" class="container m-auto">
 			<div id="header row">
-				<div class="col-sm-4">
+				<div class="col-sm-8">
 					<p class="h1">ICS-128 Final Project</p>
 					<p class="h4">Dylan Barkowsky</p>
+				</div>
+				<div class="col-sm-4">
+					<span>Currency:</span>
+					<select name="currency" id="currency">
+						<option value="cad">CAD</option>
+						<option value="usd">USD</option>
+					  </select>
 				</div>
 				<div class="col-sm-2">
 					<button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><img class="cart-button" src="./images/cart.jpg" alt=""></button>
 				</div>
 			</div>
 			<!-- Wall div displays product cards-->
-			<div id="wall" class="row row-cols-auto"></div>
+			<div id="wall" class="row"></div>
 		</div>
 
 		<!-- Offcanvas element for cart -->

@@ -24,7 +24,7 @@ class JSONHolder {
 class Cart {
     _cartList;
     _totalPrice;
-    _orderData
+    _orderData;
 
     constructor(){
         this._cartList = [];
@@ -128,16 +128,16 @@ class CartEntry {
         return this.item.id;
     }
 
+    get sum(){
+        return this._sum;
+    }
+
     set quantity(quantity){
         this._quantity = quantity;
     }
 
     set item(jsonObject){
         this._item = jsonObject;
-    }
-
-    get sum(){
-        return this._sum;
     }
 
     increaseQuantity() {
@@ -168,14 +168,17 @@ async function loadTiles(){
 
     console.log(apis.products);
     console.log(apis.currencies);
+    
+    $("#wall").empty();
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
 
     for (item in apis.products){
         $("#wall").append(` \
-        <div class="card col mx-auto my-4" style="width: 18rem;"> \
+        <div class="card col-md-4 mx-auto my-4"> \
             <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
             <div class="card-body"> \
                 <h5 class="card-title">${apis.products[item].title}</h5> \
-                <p class="card-text">$${apis.products[item].price.toFixed(2)}</p> \
+                <p class="card-text">$${convertPrice(apis.products[item].price,priceModifier)}</p> \
                 <p class="card-text">${apis.products[item].description}</p> \
                 <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
             </div> \
@@ -191,6 +194,10 @@ async function loadTiles(){
 async function loadAPI(url){
     let response = await fetch(url);
     return await response.json();
+}
+
+function convertPrice(original, modifier){
+    return (original * modifier).toFixed(2);
 }
 
 function validateField(expression, string){
@@ -247,6 +254,7 @@ function createCartObject(id){
 
 //physical cart functions
 function drawCart(){
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
     $(".offcanvas-body").empty();
     for (entry in cart.cartList){    
         $(".offcanvas-body").append(`<div class="cart-box" id="${cart.cartList[entry].id}"> \ 
@@ -254,7 +262,7 @@ function drawCart(){
                                     <img src="${cart.cartList[entry].item.image}" alt="..."> \
                                     <p>${cart.cartList[entry].item.title}</p> \
                                     <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>$${cart.cartList[entry].sum}</p> \
+                                    <p>$${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
                                 </div>`);
     }
     //add functions to all buttons
@@ -278,13 +286,14 @@ function closeModal(){
 }
 
 function drawConfirmModal(){
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
     $("#confirm-content").empty();
     for (entry in cart.cartList){    
         $("#confirm-content").append(`<div class="confirm-box" id="confirm-${cart.cartList[entry].id}"> \ 
                                     <img src="${cart.cartList[entry].item.image}" alt="..."> \
                                     <p>${cart.cartList[entry].item.title}</p> \
                                     <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>$${cart.cartList[entry].sum}</p> \
+                                    <p>$${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
                                 </div>`);
     }
 }
@@ -578,11 +587,7 @@ async function sendData(){
     });
 }
 
-/* TODO:
--add currency selector
--possibly add .trim to all fields.
--copy billing shipping fields if checkbox:checked
-*/
+
 function buildOrderData(){
     let orderData = { 
         card_number: $("#cc-number").val(),
@@ -618,6 +623,12 @@ function buildOrderData(){
     return orderData;
 }
 
+function updateCurrency(){
+    loadTiles();
+    drawCart();
+    drawConfirmModal();
+}
+
 /*
 after jquery import
 <script src="url for masonry"></script>
@@ -639,6 +650,8 @@ let cart = new Cart();
 //When document is finished loading, do these things:
 $(document).ready(function (){
     loadTiles();
+    //add listener to currency select
+    $("#currency").on("change", updateCurrency);
 
     //assign listeners to cart buttons
     $("#cart-empty").bind("click", emptyCart);
@@ -654,3 +667,24 @@ $(document).ready(function (){
     $("#confirm-prev").bind("click", confirmPrev);
     $("#confirm-final").bind("click", confirmFinal);
 });
+
+/* TODO:
+-add currency selector and have it change all currency fields
+-possibly add .trim to all fields json to send.
+-copy billing shipping fields if checkbox:checked
+-replace province and country options with drop downs
+-add totals to offcanvas and modal
+-calculate tax info
+-make site look nicer
+-add notifier to cart icon
+-clear cart after purchase
+-add cookie functionality
+-move phone number and email to billing modal page
+-add reactions to successful or unsuccessful order
+-insert try/catch somewhere
+-add comments
+-restrict modal tabs
+-add animations
+-fix #wall so it displays nicely
+-separate loading tiles and loading apis
+*/

@@ -1,3 +1,15 @@
+div.header.row div{
+    display: inline;
+}
+
+
+.card{
+    width: 16em;
+    height: fit-content;
+    padding-top: 1em;
+    background-color: white;
+}
+
 .cart-button{
     width: 20px;
     height: 20px;
@@ -31,14 +43,3 @@
     display: none;
 }
 
-
-/* For desktop screens
-@media only screen and (min-width: 1368px){
-    #container{
-        width: 70%;
-        margin: 2em auto;
-    }  
-}
-
-
- */
