@@ -66,10 +66,13 @@ class Cart {
 
     calculateTotal(){
         let tempTotal = 0;
-        for (x in this.cartList){
-            tempTotal += x.sum;
+        for (let x in this.cartList){
+            tempTotal += parseFloat(this.cartList[x].sum);
+            console.log("entry price " + this.cartList[x].sum);
+            console.log("tempTotal " + tempTotal);
         }
-        this.totalPrice = tempTotal.toFixed(2);
+        this.totalPrice = parseFloat(tempTotal).toFixed(2);
+        console.log(`total price ${this.totalPrice}`);
     }
 
     entryExists(tempEntry){
@@ -86,12 +89,14 @@ class Cart {
             if (this.cartList[entry].id == id){
                 this.cartList[entry].increaseQuantity();
                 $(`.cart-box[id="${id}"]`).closest(".quantity").html = `$${this.cartList[entry].sum}`;
+                this.cartList[entry].calculateSum();
             }
         }
     }
 
     empty(){
         this._cartList = [];
+        drawCart();
     }
 
     isEmpty(){
@@ -154,7 +159,30 @@ class CartEntry {
 }
 
 //Waits for API calls, then loads tiles into view
-async function loadTiles(){
+function drawCards(){
+    $("#wall").empty();
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
+
+    for (item in apis.products){
+        $("#wall").append(` \
+        <div class="card col-md-4 mx-auto my-4"> \
+            <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
+            <div class="card-body"> \
+                <h5 class="card-title">${apis.products[item].title}</h5> \
+                <p class="card-text">$${convertPrice(apis.products[item].price,priceModifier)}</p> \
+                <p class="card-text" data-config="{ 'type': 'text', 'limit': 5, 'more': '&#8594; show more', 'less': '&#8592; less' }">${apis.products[item].description}</p> \
+                <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
+            </div> \
+        </div>`);
+    }
+
+    //attach listener to button
+    $(".card-button").bind("click", addToCart);
+    
+    console.log("end loadTiles");
+}
+
+async function getAPICalls(){
     //get api calls
     try {
         //real api from fakestoreapi
@@ -168,27 +196,6 @@ async function loadTiles(){
 
     console.log(apis.products);
     console.log(apis.currencies);
-    
-    $("#wall").empty();
-    let priceModifier = apis.currencies.cad[$("#currency").val()];
-
-    for (item in apis.products){
-        $("#wall").append(` \
-        <div class="card col-md-4 mx-auto my-4"> \
-            <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
-            <div class="card-body"> \
-                <h5 class="card-title">${apis.products[item].title}</h5> \
-                <p class="card-text">$${convertPrice(apis.products[item].price,priceModifier)}</p> \
-                <p class="card-text">${apis.products[item].description}</p> \
-                <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
-            </div> \
-        </div>`);
-    }
-
-    //attach listener to button
-    $(".card-button").bind("click", addToCart);
-    
-    console.log("end loadTiles");
 }
 
 async function loadAPI(url){
@@ -197,7 +204,7 @@ async function loadAPI(url){
 }
 
 function convertPrice(original, modifier){
-    return (original * modifier).toFixed(2);
+    return parseFloat((original * modifier).toFixed(2));
 }
 
 function validateField(expression, string){
@@ -228,10 +235,9 @@ function addToCart(){
         console.log("entry is new");
         cart.addEntry(tempEntry);
         console.log(`current item: ${tempEntry.id}`);
-
-
     }
-
+    cart.calculateTotal();
+    console.log(`current total ${cart.totalPrice}`);
     drawCart();
     console.log(`current cart: ${cart.cartList}`);
     $("#cart-checkout").removeAttr("disabled");
@@ -265,6 +271,9 @@ function drawCart(){
                                     <p>$${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
                                 </div>`);
     }
+    //set subtotal
+    console.log(cart.totalPrice);
+    $("#cart-subtotal").html(`$${convertPrice(cart.totalPrice, priceModifier)}`);
     //add functions to all buttons
     $(".cart-remove").bind("click", removeFromCart);
 }
@@ -296,6 +305,10 @@ function drawConfirmModal(){
                                     <p>$${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
                                 </div>`);
     }
+    $("#confirm-subtotal").html(`$${convertPrice(cart.totalPrice, priceModifier)}`);
+    $("#confirm-taxes").html(`$${(convertPrice(cart.totalPrice, priceModifier)*0.12).toFixed(2)}`);
+    $("#confirm-shipping").html(`$5.00`);
+    $("#confirm-total").html(`$${(convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2)}`);
 }
 
 //modal prev-next buttons
@@ -349,11 +362,29 @@ function billingPrev(){
 function billingNext(){
     let verificationPassed = true;
     let nameRegex = "^[A-Za-z\\s-]+[a-z]+";
-    let aptRegex = "^[0-9]*$";
+    let aptRegex = "^[0-9A-Za-z]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
     let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
     let provinceRegex = "^[A-Z]{2}$";
     let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+    let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
+    let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
+
+    //check email field
+    if (!validateField(emailRegex, $("#bill-email").val())){
+        $("#bill-email-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-email-feedback").fadeOut(250);
+    }
+
+    //check phone field
+    if (!validateField(phoneRegex, $("#bill-phone").val())){
+        $("#bill-phone-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-phone-feedback").fadeOut(250);
+    }
 
     //check first name field
     if (!validateField(nameRegex, $("#bill-fname").val())){
@@ -544,30 +575,8 @@ function confirmPrev(){
 }
 
 function confirmFinal(){
-    let verificationPassed = true;
-    let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
-    let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
-
-    //check email field
-    if (!validateField(emailRegex, $("#confirm-email").val())){
-        $("#confirm-email-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#confirm-email-feedback").fadeOut(250);
-    }
-
-    //check phone field
-    if (!validateField(phoneRegex, $("#confirm-phone").val())){
-        $("#confirm-phone-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#confirm-phone-feedback").fadeOut(250);
-    }
-
-    if (verificationPassed){
-        //time to submit json data
-        sendData();
-    }
+    //time to submit json data
+    sendData();
 }
 
 async function sendData(){
@@ -580,6 +589,7 @@ async function sendData(){
         body: JSON.stringify(cart.orderData)
     }).then(response => {
         //if post is successful
+        emptyCart();
         console.log(response);
     }).catch(error => {
         //if post is NOT successful
@@ -594,8 +604,8 @@ function buildOrderData(){
         expiry_month: $("#cc-month").val(),
         expiry_year: $("#cc-year").val(),
         security_code: $("#cc-cvc").val(),
-        amount: cart.totalPrice,
-        currency: 'three character currency code, lowercase -- example: cad',
+        amount: (convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2),
+        currency: $("#currency").val(),
         billing: {
             first_name: $("#bill-fname").val(),
             last_name: $("#bill-lname").val(),
@@ -624,9 +634,17 @@ function buildOrderData(){
 }
 
 function updateCurrency(){
-    loadTiles();
+    drawCards();
     drawCart();
     drawConfirmModal();
+}
+
+function billingLocationChange(){
+
+}
+
+function shippingLocationChange(){
+    
 }
 
 /*
@@ -649,7 +667,12 @@ let cart = new Cart();
 
 //When document is finished loading, do these things:
 $(document).ready(function (){
-    loadTiles();
+    const getAPI = async () => {
+        await getAPICalls();
+        drawCards();
+    };
+    getAPI();
+
     //add listener to currency select
     $("#currency").on("change", updateCurrency);
 
@@ -669,22 +692,17 @@ $(document).ready(function (){
 });
 
 /* TODO:
--add currency selector and have it change all currency fields
 -possibly add .trim to all fields json to send.
 -copy billing shipping fields if checkbox:checked
 -replace province and country options with drop downs
--add totals to offcanvas and modal
 -calculate tax info
 -make site look nicer
 -add notifier to cart icon
--clear cart after purchase
 -add cookie functionality
--move phone number and email to billing modal page
 -add reactions to successful or unsuccessful order
--insert try/catch somewhere
 -add comments
 -restrict modal tabs
 -add animations
 -fix #wall so it displays nicely
--separate loading tiles and loading apis
+-change .bind to .on where possible
 */
