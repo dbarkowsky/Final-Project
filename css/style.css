@@ -43,3 +43,14 @@ div.header.row div{
     display: none;
 }
 
+#success-response{
+    border: 2px solid;
+    border-color: green;
+}
+
+#fail-response{
+    display: none;
+    border: 2px solid;
+    border-color: red;
+}
+

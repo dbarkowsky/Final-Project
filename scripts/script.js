@@ -612,9 +612,14 @@ async function sendData(){
         //if post is successful
         emptyCart();
         console.log(response);
+        //let customer know
+        $("#confirm").removeClass("show active");
+        $("#success-response").addClass("show active"); 
     }).catch(error => {
         //if post is NOT successful
         console.log(error);
+        //let customer know
+        $("#fail-response").fadeIn(1000);  
     });
 }
 
@@ -622,33 +627,33 @@ async function sendData(){
 function buildOrderData(){
     let priceModifier = apis.currencies.cad[$("#currency").val()];
     let orderData = { 
-        card_number: $("#cc-number").val(),
+        card_number: $("#cc-number").val().trim(),
         expiry_month: $("#cc-month").val(),
         expiry_year: $("#cc-year").val(),
-        security_code: $("#cc-cvc").val(),
+        security_code: $("#cc-cvc").val().trim(),
         amount: (convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2),
         currency: $("#currency").val(),
         billing: {
-            first_name: $("#bill-fname").val(),
-            last_name: $("#bill-lname").val(),
-            address_1: $("#bill-housenumber").val(),
-            address_2: $("#bill-apt").val(),
-            city: $("#bill-city").val(),
+            first_name: $("#bill-fname").val().trim(),
+            last_name: $("#bill-lname").val().trim(),
+            address_1: $("#bill-housenumber").val().trim(),
+            address_2: $("#bill-apt").val().trim(),
+            city: $("#bill-city").val().trim(),
             province: $("#bill-province").val(),
             country: $("#bill-country").val(),
-            postal: $("#bill-postal").val(),
-            phone: $("#confirm-phone").val(),
-            email: $("#confirm-email").val()
+            postal: $("#bill-postal").val().trim(),
+            phone: $("#bill-phone").val().trim(),
+            email: $("#bill-email").val().trim()
         },
         shipping: {
-            first_name: $("#ship-fname").val(),
-            last_name: $("#ship-lname").val(),
-            address_1: $("#ship-housenumber").val(),
-            address_2: $("#ship-apt").val(),
-            city: $("#ship-city").val(),
-            province: $("#ship-province").val(),
-            country: $("#ship-country").val(),
-            postal: $("#ship-postal").val()  
+            first_name: $("#ship-fname").val().trim(),
+            last_name: $("#ship-lname").val().trim(),
+            address_1: $("#ship-housenumber").val().trim(),
+            address_2: $("#ship-apt").val().trim(),
+            city: $("#ship-city").val().trim(),
+            province: $("#ship-province").val().trim(),
+            country: $("#ship-country").val().trim(),
+            postal: $("#ship-postal").val().trim()  
         }
     }
 
@@ -938,6 +943,31 @@ function billToShipCheckbox(){
     }
 }
 
+function testFill(){
+    //payment
+    $("#cc-number").val("1234 1234 1234 1234");
+    $("#cc-cvc").val("123");
+    $("#cc-year").val("24");
+    $("#cc-month").val("03");
+
+    //billing
+    $("#bill-email").val("dsfsd@gml.com");
+    $("#bill-phone").val("456-456-7894");
+    $("#bill-fname").val("Ted");
+    $("#bill-lname").val("Bundy");
+    $("#bill-apt").val("");
+    $("#bill-housenumber").val("742");
+    $("#bill-street").val("Evergreen Terr");
+    $("#bill-city").val("Springfield");
+    $("#bill-country").val("CANADA");
+    $("#bill-province").val("BC");
+    $("#bill-postal").val("V8R2J6");
+    
+    //shipping
+    $("#same-shipping").prop("checked", true);
+    billToShipCheckbox();
+}
+
 /*
 after jquery import
 <script src="url for masonry"></script>
@@ -997,17 +1027,25 @@ $(document).ready(function (){
     $("#bill-province").val("AB");
     $("#ship-country").val("CANADA");
     $("#ship-province").val("AB");
+
+    //reset shipping checkbox
+    $("#same-shipping").prop("checked", false);
+
+    //testing function
+    testFill();
 });
 
 /* TODO:
--possibly add .trim to all fields json to send.
+Required:
 -make site look nicer
--add notifier to cart icon
--add cookie functionality
--add reactions to successful or unsuccessful order
 -add comments
 -restrict modal tabs
--add animations
 -fix #wall so it displays nicely
+
+
+Extra:
+-add notifier to cart icon
+-add cookie functionality
+-add animations
 =condense code
 */
