@@ -170,7 +170,7 @@ function drawCards(){
             <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
             <div class="card-body"> \
                 <h5 class="card-title">${apis.products[item].title}</h5> \
-                <p class="card-text">${currencySymbol[$("#currency").val()]}${convertPrice(apis.products[item].price,priceModifier)}</p> \
+                <p class="card-text">${currencySymbol[$("#currency").val()]}${convertPrice(apis.products[item].price,priceModifier).toFixed(2)}</p> \
                 <p class="card-text" data-config="{ 'type': 'text', 'limit': 5, 'more': '&#8594; show more', 'less': '&#8592; less' }">${apis.products[item].description}</p> \
                 <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
             </div> \
@@ -272,12 +272,12 @@ function drawCart(){
                                     <img src="${cart.cartList[entry].item.image}" alt="..."> \
                                     <p>${cart.cartList[entry].item.title}</p> \
                                     <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
+                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p> \
                                 </div>`);
     }
     //set subtotal
     console.log(cart.totalPrice);
-    $("#cart-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier)}`);
+    $("#cart-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
     //add functions to all buttons
     $(".cart-remove").bind("click", removeFromCart);
 }
@@ -311,7 +311,7 @@ function drawConfirmModal(){
                                     <img src="${cart.cartList[entry].item.image}" alt="..."> \
                                     <p>${cart.cartList[entry].item.title}</p> \
                                     <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
+                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p> \
                                 </div>`);
     }
 
@@ -321,7 +321,7 @@ function drawConfirmModal(){
 
     console.log(`current tax: ${taxes[country][province]}`);
     //flat rate of $5 for shipping, not converted for currency. Shipping is taxable.
-    $("#confirm-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier)}`);
+    $("#confirm-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
     $("#confirm-shipping").html(`${currencySymbol[$("#currency").val()]}5.00`);
     $("#confirm-taxes").html(`${currencySymbol[$("#currency").val()]}${((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]).toFixed(2)}`);
     $("#confirm-total").html(`${currencySymbol[$("#currency").val()]}${(convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2)}`);
@@ -479,6 +479,7 @@ function billingNext(){
         $("#shipping").addClass("show active");
         $("#billing-tab").removeClass("active").attr("selected", "false");
         $("#shipping-tab").addClass("active").attr("selected", "true");
+        billToShipCheckbox();
     }
 }
 
@@ -747,7 +748,7 @@ function billingProvinceChange(){
     //potentially copy new values to shipping if they are linked
     //will need to call shippingLocationChange as well in that case
     if ($("#same-shipping").prop("checked")){
-        billToShipCheckbox();
+        $("#ship-province").val($("#bill-province").val());
         shippingProvinceChange();
     }
 }
@@ -827,8 +828,8 @@ function billingCountryChange(){
     //potentially copy new values to shipping if they are linked
     //will need to call shippingLocationChange as well in that case
     if ($("#same-shipping").prop("checked")){
-        billToShipCheckbox();
-        shippingProvinceChange();
+        $("#ship-country").val($("#bill-country").val());
+        shippingCountryChange();
     }
 }
 
@@ -968,18 +969,18 @@ $(document).ready(function (){
     $("#currency").on("change", updateCurrency);
 
     //assign listeners to cart buttons
-    $("#cart-empty").bind("click", emptyCart);
-    $("#cart-checkout").bind("click", checkout);
+    $("#cart-empty").on("click", emptyCart);
+    $("#cart-checkout").on("click", checkout);
     
     //assign listeners to modal buttons
-    $(".close-modal").bind("click", closeModal);
-    $("#payment-next").bind("click", paymentNext);
-    $("#billing-prev").bind("click", billingPrev);
-    $("#billing-next").bind("click", billingNext);
-    $("#shipping-prev").bind("click", shippingPrev);
-    $("#shipping-next").bind("click", shippingNext);
-    $("#confirm-prev").bind("click", confirmPrev);
-    $("#confirm-final").bind("click", confirmFinal);
+    $(".close-modal").on("click", closeModal);
+    $("#payment-next").on("click", paymentNext);
+    $("#billing-prev").on("click", billingPrev);
+    $("#billing-next").on("click", billingNext);
+    $("#shipping-prev").on("click", shippingPrev);
+    $("#shipping-next").on("click", shippingNext);
+    $("#confirm-prev").on("click", confirmPrev);
+    $("#confirm-final").on("click", confirmFinal);
 
     //assign listener to same shipping address checkbox
     $("#same-shipping").on("click", billToShipCheckbox);
@@ -1008,5 +1009,5 @@ $(document).ready(function (){
 -restrict modal tabs
 -add animations
 -fix #wall so it displays nicely
--change .bind to .on where possible
+=condense code
 */
