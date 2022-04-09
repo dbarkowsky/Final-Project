@@ -330,7 +330,7 @@ function drawConfirmModal(){
 //modal prev-next buttons
 function paymentNext(){
     let verificationPassed = true;
-    let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*";
+    let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*$";
     let ccCVCRegex = "^[0-9]{3}$";
     let ccExpiryRegex = "^[0-9]{2}$";
 
@@ -1029,7 +1029,7 @@ $(document).ready(function (){
     $("#ship-province").val("AB");
 
     //reset shipping checkbox
-    $("#same-shipping").prop("checked", false);
+    $("#same-shipping").removeProp("checked");
 
     //testing function
     testFill();
@@ -1038,9 +1038,17 @@ $(document).ready(function (){
 /* TODO:
 Required:
 -make site look nicer
+    -fix #wall so it displays nicely
+    -position cart button better
+    -replace cart icon with something nice
+    -stylize wall page
+    -stylize cards
+    -stylize cart items
+    -stylize cart totals
+    -fix modal tab look
+    -fix placement of modal fields
+    -make response text look good
 -add comments
--restrict modal tabs
--fix #wall so it displays nicely
 
 
 Extra:

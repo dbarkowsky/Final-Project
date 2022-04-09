@@ -64,18 +64,20 @@
 						</button>
 					</div>
 					<div class="modal-body container">
+						<!-- Navigation function removed from these tabs intentionally.
+							 Do not want users to circumvent field checking. -->
 						<ul class="nav nav-tabs" id="myTab" role="tablist">
-							<li class="nav-item" role="presentation">
-							  <button class="nav-link active" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="true">Pay</button>
+							<li class="nav-item" >
+							  	<p class="nav-link active" id="payment-tab"  aria-controls="payment" aria-selected="true">Pay</p>
 							</li>
 							<li class="nav-item" role="presentation">
-							  <button class="nav-link" id="billing-tab" data-bs-toggle="tab" data-bs-target="#billing" type="button" role="tab" aria-controls="billing" aria-selected="false">Bill</button>
+							  	<p class="nav-link" id="billing-tab"   role="tab" aria-controls="billing" aria-selected="false">Bill</p>
 							</li>
 							<li class="nav-item" role="presentation">
-							  <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab" aria-controls="shipping" aria-selected="false">Ship</button>
+							  	<p class="nav-link" id="shipping-tab"   role="tab" aria-controls="shipping" aria-selected="false">Ship</p>
 							</li>
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="confirm-tab" data-bs-toggle="tab" data-bs-target="#confirm" type="button" role="tab" aria-controls="confirm" aria-selected="false">Confirm</button>
+								<p class="nav-link" id="confirm-tab"   role="tab" aria-controls="confirm" aria-selected="false">Confirm</p>
 							</li>
 						</ul>
 						<div class="tab-content" id="myTabContent">
@@ -98,11 +100,37 @@
 									</div>	
 									<div class="row">
 										<div class="form-container col-3">
-											<input class="form-control" type="text" id="cc-month">
+											<select class="form-select" id="cc-month">
+												<option value="01">01</option>
+												<option value="02">02</option>
+												<option value="03">03</option>
+												<option value="04">04</option>
+												<option value="05">05</option>
+												<option value="06">06</option>
+												<option value="07">07</option>
+												<option value="08">08</option>
+												<option value="09">09</option>
+												<option value="10">10</option>
+												<option value="11">11</option>
+												<option value="12">12</option>
+											</select>
 										</div>
 										/
 										<div class="form-container col-3">
-											<input class="form-control" type="text" id="cc-year">
+											<select class="form-select" id="cc-year">
+												<option value="22">22</option>
+												<option value="23">23</option>
+												<option value="24">24</option>
+												<option value="25">25</option>
+												<option value="26">26</option>
+												<option value="27">27</option>
+												<option value="28">28</option>
+												<option value="29">29</option>
+												<option value="30">30</option>
+												<option value="31">31</option>
+												<option value="32">32</option>
+												<option value="33">33</option>
+											</select>
 										</div>
 									</div>
 									<div id="cc-expiry-feedback" class="col-12 feedback">bad</div>
@@ -164,7 +192,7 @@
 										</div>
 										<div class="form-container col-2">
 											<label class="form-label" for="bill-province">Province/State</label>
-											<select name="bill-province" id="bill-province">
+											<select class="form-select" name="bill-province" id="bill-province">
 												<option value="AB">AB</option>
 												<option value="BC">BC</option>
 												<option value="MB">MB</option>
@@ -183,7 +211,7 @@
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="bill-country">Country</label>
-											<select name="bill-country" id="bill-country">
+											<select class="form-select" name="bill-country" id="bill-country">
 												<option value="CANADA">Canada</option>
 												<option value="USA">USA</option>
 											</select>
@@ -246,7 +274,7 @@
 										</div>
 										<div class="form-container col-2">
 											<label class="form-label" for="ship-province">Province/State</label>
-											<select name="ship-province" id="ship-province">
+											<select class="form-select" name="ship-province" id="ship-province">
 												<option value="AB">AB</option>
 												<option value="BC">BC</option>
 												<option value="MB">MB</option>
@@ -265,7 +293,7 @@
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="ship-country">Country</label>
-											<select name="ship-country" id="ship-country">
+											<select class="form-select" name="ship-country" id="ship-country">
 												<option value="CANADA">Canada</option>
 												<option value="USA">USA</option>
 											</select>
