@@ -162,6 +162,7 @@ class CartEntry {
 function drawCards(){
     $("#wall").empty();
     let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let currencySymbol = buildCurrencySymbols();
 
     for (item in apis.products){
         $("#wall").append(` \
@@ -169,7 +170,7 @@ function drawCards(){
             <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
             <div class="card-body"> \
                 <h5 class="card-title">${apis.products[item].title}</h5> \
-                <p class="card-text">$${convertPrice(apis.products[item].price,priceModifier)}</p> \
+                <p class="card-text">${currencySymbol[$("#currency").val()]}${convertPrice(apis.products[item].price,priceModifier)}</p> \
                 <p class="card-text" data-config="{ 'type': 'text', 'limit': 5, 'more': '&#8594; show more', 'less': '&#8592; less' }">${apis.products[item].description}</p> \
                 <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
             </div> \
@@ -247,6 +248,8 @@ function removeFromCart(){
     console.log("removing from cart");
     $(this).closest(".cart-box").remove();
     cart.removeEntry(this.id);
+    cart.calculateTotal();
+    $("#cart-subtotal").html(`$${parseFloat(cart.totalPrice).toFixed(2)}`);
     //if cart is empty, disable checkout
     if (cart.isEmpty()){
         $("#cart-checkout").attr("disabled", "true");
@@ -261,6 +264,7 @@ function createCartObject(id){
 //physical cart functions
 function drawCart(){
     let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let currencySymbol = buildCurrencySymbols();
     $(".offcanvas-body").empty();
     for (entry in cart.cartList){    
         $(".offcanvas-body").append(`<div class="cart-box" id="${cart.cartList[entry].id}"> \ 
@@ -268,12 +272,12 @@ function drawCart(){
                                     <img src="${cart.cartList[entry].item.image}" alt="..."> \
                                     <p>${cart.cartList[entry].item.title}</p> \
                                     <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>$${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
+                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
                                 </div>`);
     }
     //set subtotal
     console.log(cart.totalPrice);
-    $("#cart-subtotal").html(`$${convertPrice(cart.totalPrice, priceModifier)}`);
+    $("#cart-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier)}`);
     //add functions to all buttons
     $(".cart-remove").bind("click", removeFromCart);
 }
@@ -281,6 +285,8 @@ function drawCart(){
 function emptyCart(){
     $(".offcanvas-body").empty();
     cart.empty();
+    cart.calculateTotal();
+    $("#cart-subtotal").html(`$${parseFloat(cart.totalPrice).toFixed(2)}`);
     $("#cart-checkout").attr("disabled", "true");
 }
 
@@ -296,19 +302,29 @@ function closeModal(){
 
 function drawConfirmModal(){
     let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let currencySymbol = buildCurrencySymbols();
+    let taxes = buildTaxData();
+    console.log(taxes);
     $("#confirm-content").empty();
     for (entry in cart.cartList){    
         $("#confirm-content").append(`<div class="confirm-box" id="confirm-${cart.cartList[entry].id}"> \ 
                                     <img src="${cart.cartList[entry].item.image}" alt="..."> \
                                     <p>${cart.cartList[entry].item.title}</p> \
                                     <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>$${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
+                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier)}</p> \
                                 </div>`);
     }
-    $("#confirm-subtotal").html(`$${convertPrice(cart.totalPrice, priceModifier)}`);
-    $("#confirm-taxes").html(`$${(convertPrice(cart.totalPrice, priceModifier)*0.12).toFixed(2)}`);
-    $("#confirm-shipping").html(`$5.00`);
-    $("#confirm-total").html(`$${(convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2)}`);
+
+    //taxes are based on the shipping address
+    let country = ($("#ship-country").val()).toUpperCase();
+    let province = $("#ship-province").val();
+
+    console.log(`current tax: ${taxes[country][province]}`);
+    //flat rate of $5 for shipping, not converted for currency. Shipping is taxable.
+    $("#confirm-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier)}`);
+    $("#confirm-shipping").html(`${currencySymbol[$("#currency").val()]}5.00`);
+    $("#confirm-taxes").html(`${currencySymbol[$("#currency").val()]}${((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]).toFixed(2)}`);
+    $("#confirm-total").html(`${currencySymbol[$("#currency").val()]}${(convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2)}`);
 }
 
 //modal prev-next buttons
@@ -434,21 +450,21 @@ function billingNext(){
         $("#bill-city-feedback").fadeOut(250);
     }
 
-    //check province field
-    if (!validateField(provinceRegex, $("#bill-province").val().toUpperCase())){
-        $("#bill-province-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-province-feedback").fadeOut(250);
-    }
+    // //check province field
+    // if (!validateField(provinceRegex, $("#bill-province").val().toUpperCase())){
+    //     $("#bill-province-feedback").fadeIn(250);
+    //     verificationPassed = false;
+    // } else {
+    //     $("#bill-province-feedback").fadeOut(250);
+    // }
     
-    //check country field
-    if (!validateField(wordRegex, $("#bill-country").val())){
-        $("#bill-country-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-country-feedback").fadeOut(250);
-    }
+    // //check country field
+    // if (!validateField(wordRegex, $("#bill-country").val())){
+    //     $("#bill-country-feedback").fadeIn(250);
+    //     verificationPassed = false;
+    // } else {
+    //     $("#bill-country-feedback").fadeOut(250);
+    // }
 
     //check postal field
     if (!validateField(postalRegex, $("#bill-postal").val().toUpperCase())){
@@ -471,6 +487,9 @@ function shippingPrev(){
     $("#billing").addClass("show active");
     $("#shipping-tab").removeClass("active").attr("selected", "false");
     $("#billing-tab").addClass("active").attr("selected", "true");
+    //reset checkbox and values of shipping page
+    $("#same-shipping").prop("checked", false);
+    billToShipCheckbox();
 }
 
 function shippingNext(){
@@ -534,21 +553,21 @@ function shippingNext(){
             $("#ship-city-feedback").fadeOut(250);
         }
 
-        //check province field
-        if (!validateField(provinceRegex, $("#ship-province").val().toUpperCase())){
-            $("#ship-province-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-province-feedback").fadeOut(250);
-        }
+        // //check province field
+        // if (!validateField(provinceRegex, $("#ship-province").val().toUpperCase())){
+        //     $("#ship-province-feedback").fadeIn(250);
+        //     verificationPassed = false;
+        // } else {
+        //     $("#ship-province-feedback").fadeOut(250);
+        // }
         
-        //check country field
-        if (!validateField(wordRegex, $("#ship-country").val())){
-            $("#ship-country-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-country-feedback").fadeOut(250);
-        }
+        // //check country field
+        // if (!validateField(wordRegex, $("#ship-country").val())){
+        //     $("#ship-country-feedback").fadeIn(250);
+        //     verificationPassed = false;
+        // } else {
+        //     $("#ship-country-feedback").fadeOut(250);
+        // }
 
         //check postal field
         if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
@@ -560,6 +579,7 @@ function shippingNext(){
     }
 
     if (verificationPassed){
+        drawConfirmModal();
         $("#shipping").removeClass("show active");
         $("#confirm").addClass("show active");
         $("#shipping-tab").removeClass("active").attr("selected", "false");
@@ -599,6 +619,7 @@ async function sendData(){
 
 
 function buildOrderData(){
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
     let orderData = { 
         card_number: $("#cc-number").val(),
         expiry_month: $("#cc-month").val(),
@@ -633,18 +654,287 @@ function buildOrderData(){
     return orderData;
 }
 
+function buildTaxData(){
+    let taxData = {
+        CANADA: {
+            AB: 0.05,
+            BC: 0.12,
+            MB: 0.12,
+            NB: 0.15,
+            NL: 0.15,
+            NT: 0.05,
+            NS: 0.15,
+            NU: 0.05,
+            ON: 0.13,
+            PE: 0.15,
+            QC: 0.14975,
+            SK: 0.11,
+            YT: 0.05
+        },
+        USA: {
+            AL: 0.0922,
+            AK: 0.0176,
+            AZ: 0.084,
+            AR: 0.0951,
+            CA: 0.086,
+            CO: 0.0772,
+            CT: 0.0635,
+            DE: 0,
+            DC: 0.06,
+            FL: 0.0708,
+            GA: 0.0732,
+            HI: 0.0444,
+            ID: 0.0603,
+            IL: 0.0882,
+            IN: 0.07,
+            IA: 0.0694,
+            KS: 0.0869,
+            KY: 0.06,
+            LA: 0.0952,
+            ME: 0.055,
+            MD: 0.06,
+            MA: 0.0625,
+            MI: 0.06,
+            MN: 0.0746,
+            MS: 0.0707,
+            MO: 0.0825,
+            MT: 0,
+            NE: 0.0694,
+            NV: 0.0823,
+            NH: 0,
+            NJ: 0.066,
+            NM: 0.0783,
+            NY: 0.0852,
+            NC: 0.0698,
+            ND: 0.0696,
+            OH: 0.0723,
+            OK: 0.0895,
+            OR: 0,
+            PA: 0.0634,
+            RI: 0.07,
+            SC: 0.0746,
+            SD: 0.064,
+            TN: 0.0955,
+            TX: 0.0819,
+            UT: 0.0719,
+            VT: 0.0624,
+            VA: 0.0573,
+            WA: 0.0923,
+            WV: 0.065,
+            WI: 0.0543,
+            WY: 0.0533
+        }
+    }
+    return taxData;
+}
+
+function buildCurrencySymbols(){
+    let symbols = {
+        cad:"$",
+        usd:"$",
+        eur:"€"
+    };
+    return symbols;
+}
+
 function updateCurrency(){
     drawCards();
     drawCart();
     drawConfirmModal();
 }
 
-function billingLocationChange(){
-
+function billingProvinceChange(){
+    //potentially copy new values to shipping if they are linked
+    //will need to call shippingLocationChange as well in that case
+    if ($("#same-shipping").prop("checked")){
+        billToShipCheckbox();
+        shippingProvinceChange();
+    }
 }
 
-function shippingLocationChange(){
-    
+function billingCountryChange(){
+    //update provinces list with new list
+    switch ($("#bill-country").val()){
+        case "CANADA":
+            $("#bill-province").html("<option value=\"AB\">AB</option>\
+                                    <option value=\"BC\">BC</option>\
+                                    <option value=\"MB\">MB</option>\
+                                    <option value=\"NB\">NB</option>\
+                                    <option value=\"NL\">NL</option>\
+                                    <option value=\"NS\">NS</option>\
+                                    <option value=\"NT\">NT</option>\
+                                    <option value=\"NU\">NU</option>\
+                                    <option value=\"ON\">ON</option>\
+                                    <option value=\"PE\">PE</option>\
+                                    <option value=\"QC\">QC</option>\
+                                    <option value=\"SK\">SK</option>\
+                                    <option value=\"YT\">YT</option>");
+            break;
+        case "USA":
+            $("#bill-province").html("<option value=\"AL\">AL</option> \
+                                    <option value=\"AK\">AK</option> \
+                                    <option value=\"AR\">AR</option> \
+                                    <option value=\"AZ\">AZ</option> \
+                                    <option value=\"CA\">CA</option> \
+                                    <option value=\"CO\">CO</option> \
+                                    <option value=\"CT\">CT</option> \
+                                    <option value=\"DE\">DE</option> \
+                                    <option value=\"DC\">DC</option> \
+                                    <option value=\"FL\">FL</option> \
+                                    <option value=\"GA\">GA</option> \
+                                    <option value=\"HI\">HI</option> \
+                                    <option value=\"ID\">ID</option> \
+                                    <option value=\"IL\">IL</option> \
+                                    <option value=\"IN\">IN</option> \
+                                    <option value=\"IA\">IA</option> \
+                                    <option value=\"KS\">KS</option> \
+                                    <option value=\"KY\">KY</option> \
+                                    <option value=\"LA\">LA</option> \
+                                    <option value=\"MA\">MA</option> \
+                                    <option value=\"MD\">MD</option> \
+                                    <option value=\"ME\">ME</option> \
+                                    <option value=\"MI\">MI</option> \
+                                    <option value=\"MN\">MN</option> \
+                                    <option value=\"MO\">MO</option> \
+                                    <option value=\"MS\">MS</option> \
+                                    <option value=\"MT\">MT</option> \
+                                    <option value=\"NC\">NC</option> \
+                                    <option value=\"ND\">ND</option> \
+                                    <option value=\"NE\">NE</option> \
+                                    <option value=\"NH\">NH</option> \
+                                    <option value=\"NJ\">NJ</option> \
+                                    <option value=\"NM\">NM</option> \
+                                    <option value=\"NV\">NV</option> \
+                                    <option value=\"NY\">NY</option> \
+                                    <option value=\"OH\">OH</option> \
+                                    <option value=\"OK\">OK</option> \
+                                    <option value=\"OR\">OR</option> \
+                                    <option value=\"PA\">PA</option> \
+                                    <option value=\"RI\">RI</option> \
+                                    <option value=\"SC\">SC</option> \
+                                    <option value=\"SD\">SD</option> \
+                                    <option value=\"TN\">TN</option> \
+                                    <option value=\"TX\">TX</option> \
+                                    <option value=\"UT\">UT</option> \
+                                    <option value=\"VA\">VA</option> \
+                                    <option value=\"VT\">VT</option> \
+                                    <option value=\"WA\">WA</option> \
+                                    <option value=\"WI\">WI</option> \
+                                    <option value=\"WV\">WV</option> \
+                                    <option value=\"WY\">WY</option>");
+            break;
+    }
+    //potentially copy new values to shipping if they are linked
+    //will need to call shippingLocationChange as well in that case
+    if ($("#same-shipping").prop("checked")){
+        billToShipCheckbox();
+        shippingProvinceChange();
+    }
+}
+
+function shippingProvinceChange(){
+    //redraw confirm area because taxes have changed
+    drawConfirmModal();
+}
+
+function shippingCountryChange(){
+    //update provinces list with new list
+    switch ($("#ship-country").val()){
+        case "CANADA":
+            $("#ship-province").html("<option value=\"AB\">AB</option>\
+                                    <option value=\"BC\">BC</option>\
+                                    <option value=\"MB\">MB</option>\
+                                    <option value=\"NB\">NB</option>\
+                                    <option value=\"NL\">NL</option>\
+                                    <option value=\"NS\">NS</option>\
+                                    <option value=\"NT\">NT</option>\
+                                    <option value=\"NU\">NU</option>\
+                                    <option value=\"ON\">ON</option>\
+                                    <option value=\"PE\">PE</option>\
+                                    <option value=\"QC\">QC</option>\
+                                    <option value=\"SK\">SK</option>\
+                                    <option value=\"YT\">YT</option>");
+            break;
+        case "USA":
+            $("#ship-province").html("<option value=\"AL\">AL</option> \
+                                    <option value=\"AK\">AK</option> \
+                                    <option value=\"AR\">AR</option> \
+                                    <option value=\"AZ\">AZ</option> \
+                                    <option value=\"CA\">CA</option> \
+                                    <option value=\"CO\">CO</option> \
+                                    <option value=\"CT\">CT</option> \
+                                    <option value=\"DE\">DE</option> \
+                                    <option value=\"DC\">DC</option> \
+                                    <option value=\"FL\">FL</option> \
+                                    <option value=\"GA\">GA</option> \
+                                    <option value=\"HI\">HI</option> \
+                                    <option value=\"ID\">ID</option> \
+                                    <option value=\"IL\">IL</option> \
+                                    <option value=\"IN\">IN</option> \
+                                    <option value=\"IA\">IA</option> \
+                                    <option value=\"KS\">KS</option> \
+                                    <option value=\"KY\">KY</option> \
+                                    <option value=\"LA\">LA</option> \
+                                    <option value=\"MA\">MA</option> \
+                                    <option value=\"MD\">MD</option> \
+                                    <option value=\"ME\">ME</option> \
+                                    <option value=\"MI\">MI</option> \
+                                    <option value=\"MN\">MN</option> \
+                                    <option value=\"MO\">MO</option> \
+                                    <option value=\"MS\">MS</option> \
+                                    <option value=\"MT\">MT</option> \
+                                    <option value=\"NC\">NC</option> \
+                                    <option value=\"ND\">ND</option> \
+                                    <option value=\"NE\">NE</option> \
+                                    <option value=\"NH\">NH</option> \
+                                    <option value=\"NJ\">NJ</option> \
+                                    <option value=\"NM\">NM</option> \
+                                    <option value=\"NV\">NV</option> \
+                                    <option value=\"NY\">NY</option> \
+                                    <option value=\"OH\">OH</option> \
+                                    <option value=\"OK\">OK</option> \
+                                    <option value=\"OR\">OR</option> \
+                                    <option value=\"PA\">PA</option> \
+                                    <option value=\"RI\">RI</option> \
+                                    <option value=\"SC\">SC</option> \
+                                    <option value=\"SD\">SD</option> \
+                                    <option value=\"TN\">TN</option> \
+                                    <option value=\"TX\">TX</option> \
+                                    <option value=\"UT\">UT</option> \
+                                    <option value=\"VA\">VA</option> \
+                                    <option value=\"VT\">VT</option> \
+                                    <option value=\"WA\">WA</option> \
+                                    <option value=\"WI\">WI</option> \
+                                    <option value=\"WV\">WV</option> \
+                                    <option value=\"WY\">WY</option>");
+            break;
+    }
+
+    shippingProvinceChange();
+}
+
+function billToShipCheckbox(){
+    if($("#same-shipping").prop("checked")){
+        $("#ship-fname").val($("#bill-fname").val());
+        $("#ship-lname").val($("#bill-lname").val());
+        $("#ship-apt").val($("#bill-apt").val());
+        $("#ship-housenumber").val($("#bill-housenumber").val());
+        $("#ship-street").val($("#bill-street").val());
+        $("#ship-city").val($("#bill-city").val());
+        $("#ship-country").val($("#bill-country").val());
+        $("#ship-province").val($("#bill-province").val());
+        $("#ship-postal").val($("#bill-postal").val());
+    } else {
+        $("#ship-fname").val("");
+        $("#ship-lname").val("");
+        $("#ship-apt").val("");
+        $("#ship-housenumber").val("");
+        $("#ship-street").val("");
+        $("#ship-city").val("");
+        $("#ship-country").val("");
+        $("#ship-province").val("");
+        $("#ship-postal").val("");
+    }
 }
 
 /*
@@ -672,6 +962,7 @@ $(document).ready(function (){
         drawCards();
     };
     getAPI();
+    
 
     //add listener to currency select
     $("#currency").on("change", updateCurrency);
@@ -689,13 +980,26 @@ $(document).ready(function (){
     $("#shipping-next").bind("click", shippingNext);
     $("#confirm-prev").bind("click", confirmPrev);
     $("#confirm-final").bind("click", confirmFinal);
+
+    //assign listener to same shipping address checkbox
+    $("#same-shipping").on("click", billToShipCheckbox);
+
+    //assign listeners to modal drop down menus
+    $("#bill-country").on("change", billingCountryChange);
+    $("#bill-province").on("change", billingProvinceChange);
+    $("#ship-country").on("change", shippingCountryChange);
+    $("#ship-province").on("change", shippingProvinceChange);
+
+    //reset drop downs to default
+    $("#currency").val("cad");
+    $("#bill-country").val("CANADA");
+    $("#bill-province").val("AB");
+    $("#ship-country").val("CANADA");
+    $("#ship-province").val("AB");
 });
 
 /* TODO:
 -possibly add .trim to all fields json to send.
--copy billing shipping fields if checkbox:checked
--replace province and country options with drop downs
--calculate tax info
 -make site look nicer
 -add notifier to cart icon
 -add cookie functionality

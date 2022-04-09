@@ -26,6 +26,7 @@
 					<select name="currency" id="currency">
 						<option value="cad">CAD</option>
 						<option value="usd">USD</option>
+						<option value="eur">EUR</option>
 					  </select>
 				</div>
 				<div class="col-sm-2">
@@ -65,16 +66,16 @@
 					<div class="modal-body container">
 						<ul class="nav nav-tabs" id="myTab" role="tablist">
 							<li class="nav-item" role="presentation">
-							  <button class="nav-link active" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="true">Payment Info</button>
+							  <button class="nav-link active" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="true">Pay</button>
 							</li>
 							<li class="nav-item" role="presentation">
-							  <button class="nav-link" id="billing-tab" data-bs-toggle="tab" data-bs-target="#billing" type="button" role="tab" aria-controls="billing" aria-selected="false">Billing</button>
+							  <button class="nav-link" id="billing-tab" data-bs-toggle="tab" data-bs-target="#billing" type="button" role="tab" aria-controls="billing" aria-selected="false">Bill</button>
 							</li>
 							<li class="nav-item" role="presentation">
-							  <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab" aria-controls="shipping" aria-selected="false">Shipping</button>
+							  <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab" aria-controls="shipping" aria-selected="false">Ship</button>
 							</li>
 							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="confirm-tab" data-bs-toggle="tab" data-bs-target="#confirm" type="button" role="tab" aria-controls="confirm" aria-selected="false">Confirmation</button>
+								<button class="nav-link" id="confirm-tab" data-bs-toggle="tab" data-bs-target="#confirm" type="button" role="tab" aria-controls="confirm" aria-selected="false">Confirm</button>
 							</li>
 						</ul>
 						<div class="tab-content" id="myTabContent">
@@ -163,14 +164,28 @@
 										</div>
 										<div class="form-container col-2">
 											<label class="form-label" for="bill-province">Province/State</label>
-											<input class="form-control" type="text" id="bill-province">
+											<select name="bill-province" id="bill-province">
+												<option value="AB">AB</option>
+												<option value="BC">BC</option>
+												<option value="MB">MB</option>
+												<option value="NB">NB</option>
+												<option value="NL">NL</option>
+												<option value="NS">NS</option>
+												<option value="NT">NT</option>
+												<option value="NU">NU</option>
+												<option value="ON">ON</option>
+												<option value="PE">PE</option>
+												<option value="QC">QC</option>
+												<option value="SK">SK</option>
+												<option value="YT">YT</option>
+											</select>
 											<div class="feedback" id="bill-province-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="bill-country">Country</label>
 											<select name="bill-country" id="bill-country">
-												<option value="canada">Canada</option>
-												<option value="usa">USA</option>
+												<option value="CANADA">Canada</option>
+												<option value="USA">USA</option>
 											</select>
 											<div class="feedback" id="bill-country-feedback">bad</div>
 										</div>
@@ -231,12 +246,29 @@
 										</div>
 										<div class="form-container col-2">
 											<label class="form-label" for="ship-province">Province/State</label>
-											<input class="form-control" type="text" id="ship-province">
+											<select name="ship-province" id="ship-province">
+												<option value="AB">AB</option>
+												<option value="BC">BC</option>
+												<option value="MB">MB</option>
+												<option value="NB">NB</option>
+												<option value="NL">NL</option>
+												<option value="NS">NS</option>
+												<option value="NT">NT</option>
+												<option value="NU">NU</option>
+												<option value="ON">ON</option>
+												<option value="PE">PE</option>
+												<option value="QC">QC</option>
+												<option value="SK">SK</option>
+												<option value="YT">YT</option>
+											</select>
 											<div class="feedback" id="ship-province-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
 											<label class="form-label" for="ship-country">Country</label>
-											<input class="form-control" type="text" id="ship-country">
+											<select name="ship-country" id="ship-country">
+												<option value="CANADA">Canada</option>
+												<option value="USA">USA</option>
+											</select>
 											<div class="feedback" id="ship-country-feedback">bad</div>
 										</div>
 										<div class="form-container col-3">
@@ -258,10 +290,10 @@
 										<div>Subtotal:</div><div id="confirm-subtotal">$0.00</div>
 									</div>
 									<div class="d-flex container-fluid justify-content-between">
-										<div>Taxes:</div><div id="confirm-taxes">$0.00</div>
+										<div>Shipping:</div><div id="confirm-shipping">$0.00</div>
 									</div>
 									<div class="d-flex container-fluid justify-content-between">
-										<div>Shipping:</div><div id="confirm-shipping">$0.00</div>
+										<div>Taxes:</div><div id="confirm-taxes">$0.00</div>
 									</div>
 									<div class="d-flex container-fluid justify-content-between">
 										<div>Total:</div><div id="confirm-total">$0.00</div>
