@@ -178,7 +178,7 @@ function drawCards(){
     }
 
     //attach listener to button
-    $(".card-button").bind("click", addToCart);
+    $(".card-button").on("click", addToCart);
     
     console.log("end loadTiles");
 }
@@ -279,7 +279,7 @@ function drawCart(){
     console.log(cart.totalPrice);
     $("#cart-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
     //add functions to all buttons
-    $(".cart-remove").bind("click", removeFromCart);
+    $(".cart-remove").on("click", removeFromCart);
 }
 
 function emptyCart(){
@@ -291,7 +291,11 @@ function emptyCart(){
 }
 
 function checkout(){
-        drawConfirmModal();
+        //don't draw modal here. Needs tax info, which might not be set.
+        $(".tab-pane.show").removeClass("show active");
+        $(".nav-link.active").removeClass("active").attr("selected", "false");
+        $(".tab-pane#payment").addClass("show active");
+        $(".nav-link#payment-tab").addClass("active").attr("selected", "true");
         $("#checkout-modal").modal("show");
 }
 
@@ -381,7 +385,6 @@ function billingNext(){
     let aptRegex = "^[0-9A-Za-z]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
     let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
-    let provinceRegex = "^[A-Z]{2}$";
     let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
     let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
     let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
@@ -450,22 +453,6 @@ function billingNext(){
         $("#bill-city-feedback").fadeOut(250);
     }
 
-    // //check province field
-    // if (!validateField(provinceRegex, $("#bill-province").val().toUpperCase())){
-    //     $("#bill-province-feedback").fadeIn(250);
-    //     verificationPassed = false;
-    // } else {
-    //     $("#bill-province-feedback").fadeOut(250);
-    // }
-    
-    // //check country field
-    // if (!validateField(wordRegex, $("#bill-country").val())){
-    //     $("#bill-country-feedback").fadeIn(250);
-    //     verificationPassed = false;
-    // } else {
-    //     $("#bill-country-feedback").fadeOut(250);
-    // }
-
     //check postal field
     if (!validateField(postalRegex, $("#bill-postal").val().toUpperCase())){
         $("#bill-postal-feedback").fadeIn(250);
@@ -500,7 +487,6 @@ function shippingNext(){
     let aptRegex = "^[0-9]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
     let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
-    let provinceRegex = "^[A-Z]{2}$";
     let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
 
     //if you use the same values as billing, don't validate
@@ -554,22 +540,6 @@ function shippingNext(){
             $("#ship-city-feedback").fadeOut(250);
         }
 
-        // //check province field
-        // if (!validateField(provinceRegex, $("#ship-province").val().toUpperCase())){
-        //     $("#ship-province-feedback").fadeIn(250);
-        //     verificationPassed = false;
-        // } else {
-        //     $("#ship-province-feedback").fadeOut(250);
-        // }
-        
-        // //check country field
-        // if (!validateField(wordRegex, $("#ship-country").val())){
-        //     $("#ship-country-feedback").fadeIn(250);
-        //     verificationPassed = false;
-        // } else {
-        //     $("#ship-country-feedback").fadeOut(250);
-        // }
-
         //check postal field
         if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
             $("#ship-postal-feedback").fadeIn(250);
@@ -608,13 +578,17 @@ async function sendData(){
     await fetch("https://deepblue.camosun.bc.ca/~c0180354/ics128/final/", {
         method: "POST",
         body: JSON.stringify(cart.orderData)
-    }).then(response => {
+    }).then(async response => {
         //if post is successful
         emptyCart();
         console.log(response);
+        let brandonsResponse = await response.json();
+        console.log(brandonsResponse);
         //let customer know
         $("#confirm").removeClass("show active");
         $("#success-response").addClass("show active"); 
+
+        
     }).catch(error => {
         //if post is NOT successful
         console.log(error);
@@ -636,7 +610,7 @@ function buildOrderData(){
         billing: {
             first_name: $("#bill-fname").val().trim(),
             last_name: $("#bill-lname").val().trim(),
-            address_1: $("#bill-housenumber").val().trim(),
+            address_1: `${$("#bill-housenumber").val().trim()} ${$("#bill-street").val().trim()}`,
             address_2: $("#bill-apt").val().trim(),
             city: $("#bill-city").val().trim(),
             province: $("#bill-province").val(),
@@ -648,7 +622,7 @@ function buildOrderData(){
         shipping: {
             first_name: $("#ship-fname").val().trim(),
             last_name: $("#ship-lname").val().trim(),
-            address_1: $("#ship-housenumber").val().trim(),
+            address_1: `${$("#bill-housenumber").val().trim()} ${$("#bill-street").val().trim()}`,
             address_2: $("#ship-apt").val().trim(),
             city: $("#ship-city").val().trim(),
             province: $("#ship-province").val().trim(),
@@ -1029,7 +1003,7 @@ $(document).ready(function (){
     $("#ship-province").val("AB");
 
     //reset shipping checkbox
-    $("#same-shipping").removeProp("checked");
+    $("#same-shipping").prop("checked", false);
 
     //testing function
     testFill();
@@ -1037,6 +1011,10 @@ $(document).ready(function (){
 
 /* TODO:
 Required:
+-check to make sure dropdowns are not blank when doing regex checks
+-trim interior spaces/characters out of some modal fields
+-add check for credit card date...
+-put explicit throw somewhere
 -make site look nicer
     -fix #wall so it displays nicely
     -position cart button better
