@@ -23,16 +23,32 @@ div.header.row div{
 .cart-box{
     height: fit-content;
     overflow: hidden;
+    border-bottom: darkslategray 1px solid;
+    padding-bottom: 1em;
 }
 
 .cart-box img{
-    height: 50px;
+    width: 100%;
     display: inline;
 }
 
 .cart-box p{
     font-size: 1em;
 }
+
+.cart-title{
+    font-weight: bold;
+}
+
+.cart-subtotal-line{
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+}
+
+/* button.cart-remove{
+    background-color: #FF4443;
+    color: cornsilk;
+} */
 
 #confirm img{
     height: 50px;

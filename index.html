@@ -23,7 +23,7 @@
 				</div>
 				<div class="col-sm-4">
 					<span>Currency:</span>
-					<select name="currency" id="currency">
+					<select class="form-select" name="currency" id="currency">
 						<option value="cad">CAD</option>
 						<option value="usd">USD</option>
 						<option value="eur">EUR</option>
@@ -38,18 +38,18 @@
 		</div>
 
 		<!-- Offcanvas element for cart -->
-		<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+		<div class="offcanvas offcanvas-end px-3" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
 			<div class="offcanvas-header">
 			  <h3 id="offcanvasRightLabel">Your Cart</h3>
 			  <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 			</div>
 			<div class="offcanvas-body"></div>
-			<div class="d-flex container-fluid justify-content-between">
+			<div class="cart-subtotal-line d-flex container-fluid justify-content-between">
 				<div>Subtotal:</div><div id="cart-subtotal">$0.00</div>
 			</div>
-			<div class="offcanvas-buttons grid">
-				<button class="btn col-6" id="cart-empty">Empty</button>
-				<button class="btn col-6" id="cart-checkout" disabled="true">Checkout</button>
+			<div class="offcanvas-buttons d-flex py-3 justify-content-between">
+				<button class="btn col btn-secondary mx-2" id="cart-empty">Empty</button>
+				<button class="btn col btn-primary mx-2" id="cart-checkout" disabled="true">Checkout</button>
 			</div>
 		</div>
 
@@ -58,7 +58,7 @@
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+						<h5 class="modal-title" id="exampleModalLongTitle">Checkout</h5>
 						<button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -90,7 +90,7 @@
 											<div class="feedback" id="cc-number-feedback">bad</div>
 										</div>
 										<div class="form-container col-4">
-											<label class="form-label" for="cc-cvc">CC cvc</label>
+											<label class="form-label" for="cc-cvc">CVC</label>
 											<input class="form-control" type="text" id="cc-cvc">
 											<div class="feedback" id="cc-cvc-feedback">bad</div>
 										</div>

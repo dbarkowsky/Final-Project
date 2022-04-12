@@ -267,13 +267,19 @@ function drawCart(){
     let currencySymbol = buildCurrencySymbols();
     $(".offcanvas-body").empty();
     for (entry in cart.cartList){    
-        $(".offcanvas-body").append(`<div class="cart-box" id="${cart.cartList[entry].id}"> \ 
-                                    <button type="button" class="cart-remove btn-close text-reset" aria-label="Close" id="${cart.cartList[entry].id}"></button> \
-                                    <img src="${cart.cartList[entry].item.image}" alt="..."> \
-                                    <p>${cart.cartList[entry].item.title}</p> \
-                                    <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p> \
-                                </div>`);
+        $(".offcanvas-body").append(`<div class="cart-box row mb-4" id="${cart.cartList[entry].id}"> 
+                                <div class="col-4">
+                                    <img src="${cart.cartList[entry].item.image}" alt="..."> 
+                                </div>
+                                <div class="col">
+                                    <p class="cart-title">${cart.cartList[entry].item.title}</p> \
+                                    <div class="d-flex row justify-content-between">
+                                        <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
+                                        <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
+                                    </div>  
+                                    <button type="button" class="cart-remove btn btn-secondary" aria-label="Close" id="${cart.cartList[entry].id}">Remove Item</button>  
+                                </div>
+                            </div>`);
     }
     //set subtotal
     console.log(cart.totalPrice);
@@ -335,7 +341,7 @@ function drawConfirmModal(){
 function paymentNext(){
     let verificationPassed = true;
     let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*$";
-    let ccCVCRegex = "^[0-9]{3}$";
+    let ccCVCRegex = "(^[0-9]{3}$|^[0-9]{4}$)";
     let ccExpiryRegex = "^[0-9]{2}$";
 
     //If the credit card field is not valid
@@ -355,7 +361,6 @@ function paymentNext(){
     }
 
     //If the Expiry fields are not valid
-    /////////////////////////////////////////////add requirement for this current date or later
     if (!validateField(ccExpiryRegex, $("#cc-month").val()) || !validateField(ccExpiryRegex, $("#cc-year").val()) || 
         new Date(`20${$("#cc-year").val()}`, $("#cc-month").val()) < new Date()){
         $("#cc-expiry-feedback").fadeIn(250);
@@ -968,6 +973,7 @@ function billToShipCheckbox(){
         $("#ship-street").val($("#bill-street").val());
         $("#ship-city").val($("#bill-city").val());
         $("#ship-country").val($("#bill-country").val());
+        $("#ship-country").change();
         $("#ship-province").val($("#bill-province").val());
         $("#ship-postal").val($("#bill-postal").val());
     } else {
