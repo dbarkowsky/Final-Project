@@ -356,7 +356,8 @@ function paymentNext(){
 
     //If the Expiry fields are not valid
     /////////////////////////////////////////////add requirement for this current date or later
-    if (!validateField(ccExpiryRegex, $("#cc-month").val()) || !validateField(ccExpiryRegex, $("#cc-year").val())){
+    if (!validateField(ccExpiryRegex, $("#cc-month").val()) || !validateField(ccExpiryRegex, $("#cc-year").val()) || 
+        new Date(`20${$("#cc-year").val()}`, $("#cc-month").val()) < new Date()){
         $("#cc-expiry-feedback").fadeIn(250);
         verificationPassed = false;
     } else {
@@ -574,19 +575,32 @@ async function sendData(){
     //build object to send
     cart.orderData = await buildOrderData();
     console.log(cart.orderData);
+    let form_data = new FormData();
+    form_data.append("submission", JSON.stringify(cart.orderData));
     //sending data to server
     await fetch("https://deepblue.camosun.bc.ca/~c0180354/ics128/final/", {
         method: "POST",
-        body: JSON.stringify(cart.orderData)
+        body: form_data
     }).then(async response => {
-        //if post is successful
-        emptyCart();
         console.log(response);
-        let brandonsResponse = await response.json();
-        console.log(brandonsResponse);
-        //let customer know
-        $("#confirm").removeClass("show active");
-        $("#success-response").addClass("show active"); 
+        try {
+            //was response successful?
+            let brandonsResponse = await response.json();
+            console.log(brandonsResponse);
+            if (brandonsResponse.status == "NOT SUBMITTED"){
+                throw new Error("Some sent data was in a format not expected by the server.");
+            }
+
+            //if post is successful
+            emptyCart();
+            //let customer know
+            $("#confirm").removeClass("show active");
+            $("#success-response").addClass("show active");
+        } catch (e) {
+            //print error message to screen instead?
+            console.log("brandon no likey");
+        } 
+         
 
         
     }).catch(error => {
@@ -601,9 +615,9 @@ async function sendData(){
 function buildOrderData(){
     let priceModifier = apis.currencies.cad[$("#currency").val()];
     let orderData = { 
-        card_number: $("#cc-number").val().trim(),
+        card_number: $("#cc-number").val().trim().replaceAll(/\s/g,''),
         expiry_month: $("#cc-month").val(),
-        expiry_year: $("#cc-year").val(),
+        expiry_year: `20${$("#cc-year").val()}`,
         security_code: $("#cc-cvc").val().trim(),
         amount: (convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2),
         currency: $("#currency").val(),
@@ -615,7 +629,7 @@ function buildOrderData(){
             city: $("#bill-city").val().trim(),
             province: $("#bill-province").val(),
             country: $("#bill-country").val(),
-            postal: $("#bill-postal").val().trim(),
+            postal: $("#bill-postal").val().trim().replaceAll(/\s/g,''),
             phone: $("#bill-phone").val().trim(),
             email: $("#bill-email").val().trim()
         },
@@ -627,7 +641,7 @@ function buildOrderData(){
             city: $("#ship-city").val().trim(),
             province: $("#ship-province").val().trim(),
             country: $("#ship-country").val().trim(),
-            postal: $("#ship-postal").val().trim()  
+            postal: $("#ship-postal").val().trim().replaceAll(/\s/g,'') 
         }
     }
 
@@ -636,7 +650,7 @@ function buildOrderData(){
 
 function buildTaxData(){
     let taxData = {
-        CANADA: {
+        CA: {
             AB: 0.05,
             BC: 0.12,
             MB: 0.12,
@@ -651,7 +665,7 @@ function buildTaxData(){
             SK: 0.11,
             YT: 0.05
         },
-        USA: {
+        US: {
             AL: 0.0922,
             AK: 0.0176,
             AZ: 0.084,
@@ -735,7 +749,7 @@ function billingProvinceChange(){
 function billingCountryChange(){
     //update provinces list with new list
     switch ($("#bill-country").val()){
-        case "CANADA":
+        case "CA":
             $("#bill-province").html("<option value=\"AB\">AB</option>\
                                     <option value=\"BC\">BC</option>\
                                     <option value=\"MB\">MB</option>\
@@ -750,7 +764,7 @@ function billingCountryChange(){
                                     <option value=\"SK\">SK</option>\
                                     <option value=\"YT\">YT</option>");
             break;
-        case "USA":
+        case "US":
             $("#bill-province").html("<option value=\"AL\">AL</option> \
                                     <option value=\"AK\">AK</option> \
                                     <option value=\"AR\">AR</option> \
@@ -820,7 +834,7 @@ function shippingProvinceChange(){
 function shippingCountryChange(){
     //update provinces list with new list
     switch ($("#ship-country").val()){
-        case "CANADA":
+        case "CA":
             $("#ship-province").html("<option value=\"AB\">AB</option>\
                                     <option value=\"BC\">BC</option>\
                                     <option value=\"MB\">MB</option>\
@@ -835,7 +849,7 @@ function shippingCountryChange(){
                                     <option value=\"SK\">SK</option>\
                                     <option value=\"YT\">YT</option>");
             break;
-        case "USA":
+        case "US":
             $("#ship-province").html("<option value=\"AL\">AL</option> \
                                     <option value=\"AK\">AK</option> \
                                     <option value=\"AR\">AR</option> \
@@ -919,7 +933,7 @@ function billToShipCheckbox(){
 
 function testFill(){
     //payment
-    $("#cc-number").val("1234 1234 1234 1234");
+    $("#cc-number").val("4111 1111 1111 1111");
     $("#cc-cvc").val("123");
     $("#cc-year").val("24");
     $("#cc-month").val("03");
@@ -933,7 +947,7 @@ function testFill(){
     $("#bill-housenumber").val("742");
     $("#bill-street").val("Evergreen Terr");
     $("#bill-city").val("Springfield");
-    $("#bill-country").val("CANADA");
+    $("#bill-country").val("CA");
     $("#bill-province").val("BC");
     $("#bill-postal").val("V8R2J6");
     
@@ -1012,9 +1026,8 @@ $(document).ready(function (){
 /* TODO:
 Required:
 -check to make sure dropdowns are not blank when doing regex checks
--trim interior spaces/characters out of some modal fields
--add check for credit card date...
--put explicit throw somewhere
+-allow for zip codes
+-change field names for postal and province when country changes
 -make site look nicer
     -fix #wall so it displays nicely
     -position cart button better
