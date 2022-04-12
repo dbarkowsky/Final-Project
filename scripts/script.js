@@ -185,6 +185,8 @@ function drawCards(){
 
 async function getAPICalls(){
     //get api calls
+    apis.currencies = await loadAPI("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/cad.json");
+
     try {
         //real api from fakestoreapi
         apis.products = await loadAPI("https://fakestoreapi.com/products");
@@ -192,8 +194,6 @@ async function getAPICalls(){
         //backup api from school's server
         apis.products = await loadAPI("https://deepblue.camosun.bc.ca/~c0180354/ics128/final/fakestoreapi.json");
     }
- 
-    apis.currencies = await loadAPI("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/cad.json");
 
     console.log(apis.products);
     console.log(apis.currencies);
@@ -386,7 +386,11 @@ function billingNext(){
     let aptRegex = "^[0-9A-Za-z]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
     let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
-    let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+    let postalRegex;
+    if ($("#bill-country").val() == "CA")
+        postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+    else 
+        postalRegex = "^[0-9]{5}$";
     let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
     let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
 
@@ -454,6 +458,22 @@ function billingNext(){
         $("#bill-city-feedback").fadeOut(250);
     }
 
+     //check if province was selected
+     if ($("#bill-province").val() == null){
+        $("#bill-province-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-province-feedback").fadeOut(250);
+    }
+
+    //check if country was selected
+    if ($("#bill-country").val() == null){
+        $("#bill-country-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#bill-country-feedback").fadeOut(250);
+    }
+
     //check postal field
     if (!validateField(postalRegex, $("#bill-postal").val().toUpperCase())){
         $("#bill-postal-feedback").fadeIn(250);
@@ -488,8 +508,11 @@ function shippingNext(){
     let aptRegex = "^[0-9]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
     let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
-    let postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
-
+    let postalRegex;
+    if ($("#bill-country").val() == "CA")
+        postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+    else 
+        postalRegex = "^[0-9]{5}$";
     //if you use the same values as billing, don't validate
     if (!$("#same-shipping").prop("checked")){
         //validate as normal
@@ -539,6 +562,22 @@ function shippingNext(){
             verificationPassed = false;
         } else {
             $("#ship-city-feedback").fadeOut(250);
+        }
+
+        //check if province was selected
+        if ($("#ship-province").val() == null){
+            $("#ship-province-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-province-feedback").fadeOut(250);
+        }
+
+        //check if country was selected
+        if ($("#ship-country").val() == null){
+            $("#ship-country-feedback").fadeIn(250);
+            verificationPassed = false;
+        } else {
+            $("#ship-country-feedback").fadeOut(250);
         }
 
         //check postal field
@@ -599,14 +638,19 @@ async function sendData(){
         } catch (e) {
             //print error message to screen instead?
             console.log("brandon no likey");
+            //let customer know
+            $("#fail-response").html(`<img src="" alt="Red X"> \
+                                <p>We're sorry, but there is an unknown error with the data being sent.</p> \
+                                <p>If this problem persists, please call 605-475-6964 for assistance.</p>`);
+            $("#fail-response").fadeIn(1000); 
         } 
-         
-
-        
     }).catch(error => {
         //if post is NOT successful
         console.log(error);
         //let customer know
+        $("#fail-response").html(`<img src="" alt="Red X"> \
+                                <p>We're sorry, but something has gone wrong. Try again soon.</p> \
+                                <p>If this problem persists, please call 605-475-6964 for assistance.</p>`);
         $("#fail-response").fadeIn(1000);  
     });
 }
@@ -763,6 +807,8 @@ function billingCountryChange(){
                                     <option value=\"QC\">QC</option>\
                                     <option value=\"SK\">SK</option>\
                                     <option value=\"YT\">YT</option>");
+            $("#bill-province-label").html("Province");
+            $("#bill-postal-label").html("Postal Code");
             break;
         case "US":
             $("#bill-province").html("<option value=\"AL\">AL</option> \
@@ -816,6 +862,8 @@ function billingCountryChange(){
                                     <option value=\"WI\">WI</option> \
                                     <option value=\"WV\">WV</option> \
                                     <option value=\"WY\">WY</option>");
+            $("#bill-province-label").html("State");
+            $("#bill-postal-label").html("ZIP Code");
             break;
     }
     //potentially copy new values to shipping if they are linked
@@ -848,6 +896,8 @@ function shippingCountryChange(){
                                     <option value=\"QC\">QC</option>\
                                     <option value=\"SK\">SK</option>\
                                     <option value=\"YT\">YT</option>");
+            $("#ship-province-label").html("Province");
+            $("#ship-postal-label").html("Postal Code");
             break;
         case "US":
             $("#ship-province").html("<option value=\"AL\">AL</option> \
@@ -901,6 +951,8 @@ function shippingCountryChange(){
                                     <option value=\"WI\">WI</option> \
                                     <option value=\"WV\">WV</option> \
                                     <option value=\"WY\">WY</option>");
+            $("#ship-province-label").html("State");
+            $("#ship-postal-label").html("ZIP Code");
             break;
     }
 
@@ -1011,9 +1063,9 @@ $(document).ready(function (){
 
     //reset drop downs to default
     $("#currency").val("cad");
-    $("#bill-country").val("CANADA");
+    $("#bill-country").val("CA");
     $("#bill-province").val("AB");
-    $("#ship-country").val("CANADA");
+    $("#ship-country").val("CA");
     $("#ship-province").val("AB");
 
     //reset shipping checkbox
@@ -1025,9 +1077,6 @@ $(document).ready(function (){
 
 /* TODO:
 Required:
--check to make sure dropdowns are not blank when doing regex checks
--allow for zip codes
--change field names for postal and province when country changes
 -make site look nicer
     -fix #wall so it displays nicely
     -position cart button better
@@ -1039,6 +1088,7 @@ Required:
     -fix modal tab look
     -fix placement of modal fields
     -make response text look good
+    -add proper error messages and fix headings
 -add comments
 
 
