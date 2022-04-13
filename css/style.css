@@ -1,18 +1,45 @@
+body{
+    background-color: oldlace;
+}
+
+.btn-primary{
+    background-color: greenyellow;
+}
+
+.btn-secondary{
+    background-color: lightcoral;
+}
+
 div.header.row div{
     display: inline;
 }
 
+#currency{
+    width: 6em;
+}
 
 .card{
-    width: 16em;
+    width: 18em;
     height: fit-content;
     padding-top: 1em;
     background-color: white;
 }
 
+#open-cart{
+    border: solid rgb(201, 201, 201) 0.5px;
+    position: fixed;
+    right: 8px;
+    top: 8px;
+    padding: 0px;
+    border-radius: 50%;
+    filter: drop-shadow(2px 2px 1px rgb(201, 201, 201));
+}
+
 .cart-button{
-    width: 20px;
-    height: 20px;
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .card-img-top{
@@ -24,10 +51,10 @@ div.header.row div{
     height: fit-content;
     overflow: hidden;
     border-bottom: darkslategray 1px solid;
-    padding-bottom: 1em;
+    padding-bottom: 0.5em;
 }
 
-.cart-box img{
+.cart-box img, .confirm-box img{
     width: 100%;
     display: inline;
 }
@@ -45,28 +72,65 @@ div.header.row div{
     padding: 0.2em 0.4em;
 }
 
-/* button.cart-remove{
-    background-color: #FF4443;
-    color: cornsilk;
-} */
+.cart-remove{
+    background-color: red;
+    height: 17px;
+    width: 20px;
+    font-weight: bold;
+    float: right;
+    padding: 0px;
+    padding-bottom: 3px;
+    line-height: 0.4;
+    margin-left: 0.5em;
+}
 
-#confirm img{
-    height: 50px;
-    display: inline;
+.nav-tabs .nav-link{
+    min-width: 70px;
+    
+    text-align: center;
+}
+
+#same-shipping{
+    width: 20px;
+}
+
+#same-shipping-div{
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+}
+
+.confirm-box{
+    border-bottom: darkslategray 1px solid;
+    padding: 0.5em 0em;
 }
 
 .feedback {
     display: none;
+    font-size: smaller;
+    color: lightcoral;
 }
 
 #success-response{
     border: 2px solid;
     border-color: green;
+    background-color: lightgreen;
+    align-items: center;
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+#checkmark{
+    font-size: 5em;
+    color: white;
+    text-align: center;
+    border: solid green;
+    border-radius: 40px;
 }
 
 #fail-response{
     display: none;
     border: 2px solid;
     border-color: red;
+    background-color: lightcoral;
 }
 

@@ -268,18 +268,18 @@ function drawCart(){
     $(".offcanvas-body").empty();
     for (entry in cart.cartList){    
         $(".offcanvas-body").append(`<div class="cart-box row mb-4" id="${cart.cartList[entry].id}"> 
-                                <div class="col-4">
-                                    <img src="${cart.cartList[entry].item.image}" alt="..."> 
-                                </div>
-                                <div class="col">
-                                    <p class="cart-title">${cart.cartList[entry].item.title}</p> \
-                                    <div class="d-flex row justify-content-between">
-                                        <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
-                                        <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
-                                    </div>  
-                                    <button type="button" class="cart-remove btn btn-secondary" aria-label="Close" id="${cart.cartList[entry].id}">Remove Item</button>  
-                                </div>
-                            </div>`);
+                                        <div class="col-4">
+                                            <img src="${cart.cartList[entry].item.image}" alt="..."> 
+                                        </div>
+                                        <div class="col">
+                                            <button type="button" class="cart-remove btn btn-secondary" aria-label="Close" id="${cart.cartList[entry].id}">–</button>
+                                            <p class="cart-title">${cart.cartList[entry].item.title}</p> 
+                                            <div class="d-flex row justify-content-between">
+                                                <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
+                                                <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
+                                            </div>  
+                                        </div>
+                                    </div>`);
     }
     //set subtotal
     console.log(cart.totalPrice);
@@ -317,11 +317,17 @@ function drawConfirmModal(){
     console.log(taxes);
     $("#confirm-content").empty();
     for (entry in cart.cartList){    
-        $("#confirm-content").append(`<div class="confirm-box" id="confirm-${cart.cartList[entry].id}"> \ 
-                                    <img src="${cart.cartList[entry].item.image}" alt="..."> \
-                                    <p>${cart.cartList[entry].item.title}</p> \
-                                    <p class="quantity">Qty: ${cart.cartList[entry].quantity}</p> \
-                                    <p>${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p> \
+        $("#confirm-content").append(`<div class="confirm-box row" id="confirm-${cart.cartList[entry].id}">  
+                                        <div class="col-3">
+                                            <img src="${cart.cartList[entry].item.image}" alt="..."> 
+                                        </div>
+                                        <div class="col">
+                                        <p class="cart-title">${cart.cartList[entry].item.title}</p> 
+                                        <div class="d-flex row justify-content-between">
+                                            <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
+                                            <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
+                                        </div>  
+                                    </div>
                                 </div>`);
     }
 
@@ -334,14 +340,14 @@ function drawConfirmModal(){
     $("#confirm-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
     $("#confirm-shipping").html(`${currencySymbol[$("#currency").val()]}5.00`);
     $("#confirm-taxes").html(`${currencySymbol[$("#currency").val()]}${((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]).toFixed(2)}`);
-    $("#confirm-total").html(`${currencySymbol[$("#currency").val()]}${(convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2)}`);
+    $("#confirm-total").html(`${currencySymbol[$("#currency").val()]}${(convertPrice(cart.totalPrice, priceModifier) + ((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]) + 5).toFixed(2)}`);
 }
 
 //modal prev-next buttons
 function paymentNext(){
     let verificationPassed = true;
     let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*$";
-    let ccCVCRegex = "(^[0-9]{3}$|^[0-9]{4}$)";
+    let ccCVCRegex = "(^[0-9]{3}$)";
     let ccExpiryRegex = "^[0-9]{2}$";
 
     //If the credit card field is not valid
@@ -387,10 +393,10 @@ function billingPrev(){
 
 function billingNext(){
     let verificationPassed = true;
-    let nameRegex = "^[A-Za-z\\s-]+[a-z]+";
+    let nameRegex = "^[A-Za-z\\s-]+[a-z]+$";
     let aptRegex = "^[0-9A-Za-z]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
-    let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
+    let wordRegex = "^[A-Za-z\\s-\\.-]+[A-Za-z]+$";
     let postalRegex;
     if ($("#bill-country").val() == "CA")
         postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
@@ -509,89 +515,86 @@ function shippingPrev(){
 function shippingNext(){
 
     let verificationPassed = true;
-    let nameRegex = "^[A-Za-z\\s-]+[a-z]+";
+    let nameRegex = "^[A-Za-z\\s-]+[a-z]+$";
     let aptRegex = "^[0-9]*$";
     let numberRegex = "^[0-9]+[A-Z]*$";
-    let wordRegex = "^[A-Za-z\\s-\\.]+[a-z]+";
+    let wordRegex = "^[A-Za-z\\s-\.-]+[A-Za-z]+$";
     let postalRegex;
     if ($("#bill-country").val() == "CA")
         postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
     else 
         postalRegex = "^[0-9]{5}$";
-    //if you use the same values as billing, don't validate
-    if (!$("#same-shipping").prop("checked")){
-        //validate as normal
-        //check first name field
-        if (!validateField(nameRegex, $("#ship-fname").val())){
-            $("#ship-fname-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-fname-feedback").fadeOut(250);
-        }
+    
+    //check first name field
+    if (!validateField(nameRegex, $("#ship-fname").val())){
+        $("#ship-fname-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-fname-feedback").fadeOut(250);
+    }
 
-        //check last name field
-        if (!validateField(nameRegex, $("#ship-lname").val())){
-            $("#ship-lname-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-lname-feedback").fadeOut(250);
-        }
+    //check last name field
+    if (!validateField(nameRegex, $("#ship-lname").val())){
+        $("#ship-lname-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-lname-feedback").fadeOut(250);
+    }
 
-        //check apt field
-        if (!validateField(aptRegex, $("#ship-apt").val())){
-            $("#ship-apt-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-apt-feedback").fadeOut(250);
-        }
+    //check apt field
+    if (!validateField(aptRegex, $("#ship-apt").val())){
+        $("#ship-apt-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-apt-feedback").fadeOut(250);
+    }
 
-        //check house number field
-        if (!validateField(numberRegex, $("#ship-housenumber").val())){
-            $("#ship-housenumber-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-housenumber-feedback").fadeOut(250);
-        }
+    //check house number field
+    if (!validateField(numberRegex, $("#ship-housenumber").val())){
+        $("#ship-housenumber-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-housenumber-feedback").fadeOut(250);
+    }
 
-        //check street field
-        if (!validateField(wordRegex, $("#ship-street").val())){
-            $("#ship-street-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-street-feedback").fadeOut(250);
-        }
+    //check street field
+    if (!validateField(wordRegex, $("#ship-street").val())){
+        $("#ship-street-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-street-feedback").fadeOut(250);
+    }
 
-        //check city field
-        if (!validateField(wordRegex, $("#ship-city").val())){
-            $("#ship-city-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-city-feedback").fadeOut(250);
-        }
+    //check city field
+    if (!validateField(wordRegex, $("#ship-city").val())){
+        $("#ship-city-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-city-feedback").fadeOut(250);
+    }
 
-        //check if province was selected
-        if ($("#ship-province").val() == null){
-            $("#ship-province-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-province-feedback").fadeOut(250);
-        }
+    //check if province was selected
+    if ($("#ship-province").val() == null){
+        $("#ship-province-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-province-feedback").fadeOut(250);
+    }
 
-        //check if country was selected
-        if ($("#ship-country").val() == null){
-            $("#ship-country-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-country-feedback").fadeOut(250);
-        }
+    //check if country was selected
+    if ($("#ship-country").val() == null){
+        $("#ship-country-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-country-feedback").fadeOut(250);
+    }
 
-        //check postal field
-        if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
-            $("#ship-postal-feedback").fadeIn(250);
-            verificationPassed = false;
-        } else {
-            $("#ship-postal-feedback").fadeOut(250);
-        }
+    //check postal field
+    if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
+        $("#ship-postal-feedback").fadeIn(250);
+        verificationPassed = false;
+    } else {
+        $("#ship-postal-feedback").fadeOut(250);
     }
 
     if (verificationPassed){
@@ -781,6 +784,7 @@ function buildCurrencySymbols(){
 }
 
 function updateCurrency(){
+    console.log("in update")
     drawCards();
     drawCart();
     drawConfirmModal();
@@ -966,26 +970,26 @@ function shippingCountryChange(){
 
 function billToShipCheckbox(){
     if($("#same-shipping").prop("checked")){
-        $("#ship-fname").val($("#bill-fname").val());
-        $("#ship-lname").val($("#bill-lname").val());
-        $("#ship-apt").val($("#bill-apt").val());
-        $("#ship-housenumber").val($("#bill-housenumber").val());
-        $("#ship-street").val($("#bill-street").val());
-        $("#ship-city").val($("#bill-city").val());
-        $("#ship-country").val($("#bill-country").val());
+        $("#ship-fname").val($("#bill-fname").val()).prop("disabled", true);
+        $("#ship-lname").val($("#bill-lname").val()).prop("disabled", true);
+        $("#ship-apt").val($("#bill-apt").val()).prop("disabled", true);
+        $("#ship-housenumber").val($("#bill-housenumber").val()).prop("disabled", true);
+        $("#ship-street").val($("#bill-street").val()).prop("disabled", true);
+        $("#ship-city").val($("#bill-city").val()).prop("disabled", true);
+        $("#ship-country").val($("#bill-country").val()).prop("disabled", true);
         $("#ship-country").change();
-        $("#ship-province").val($("#bill-province").val());
-        $("#ship-postal").val($("#bill-postal").val());
+        $("#ship-province").val($("#bill-province").val()).prop("disabled", true);
+        $("#ship-postal").val($("#bill-postal").val()).prop("disabled", true);
     } else {
-        $("#ship-fname").val("");
-        $("#ship-lname").val("");
-        $("#ship-apt").val("");
-        $("#ship-housenumber").val("");
-        $("#ship-street").val("");
-        $("#ship-city").val("");
-        $("#ship-country").val("");
-        $("#ship-province").val("");
-        $("#ship-postal").val("");
+        $("#ship-fname").val("").prop("disabled", false);
+        $("#ship-lname").val("").prop("disabled", false);
+        $("#ship-apt").val("").prop("disabled", false);
+        $("#ship-housenumber").val("").prop("disabled", false);
+        $("#ship-street").val("").prop("disabled", false);
+        $("#ship-city").val("").prop("disabled", false);
+        $("#ship-country").val("").prop("disabled", false);
+        $("#ship-province").val("").prop("disabled", false);
+        $("#ship-postal").val("").prop("disabled", false);
     }
 }
 
@@ -1061,12 +1065,6 @@ $(document).ready(function (){
     //assign listener to same shipping address checkbox
     $("#same-shipping").on("click", billToShipCheckbox);
 
-    //assign listeners to modal drop down menus
-    $("#bill-country").on("change", billingCountryChange);
-    $("#bill-province").on("change", billingProvinceChange);
-    $("#ship-country").on("change", shippingCountryChange);
-    $("#ship-province").on("change", shippingProvinceChange);
-
     //reset drop downs to default
     $("#currency").val("cad");
     $("#bill-country").val("CA");
@@ -1077,24 +1075,23 @@ $(document).ready(function (){
     //reset shipping checkbox
     $("#same-shipping").prop("checked", false);
 
+    //assign listeners to modal drop down menus
+    $("#bill-country").on("change", billingCountryChange);
+    $("#bill-province").on("change", billingProvinceChange);
+    $("#ship-country").on("change", shippingCountryChange);
+    $("#ship-province").on("change", shippingProvinceChange);
+
     //testing function
-    testFill();
+    //testFill();
 });
 
 /* TODO:
 Required:
 -make site look nicer
     -fix #wall so it displays nicely
-    -position cart button better
-    -replace cart icon with something nice
     -stylize wall page
     -stylize cards
-    -stylize cart items
-    -stylize cart totals
-    -fix modal tab look
-    -fix placement of modal fields
     -make response text look good
-    -add proper error messages and fix headings
 -add comments
 
 
@@ -1103,4 +1100,5 @@ Extra:
 -add cookie functionality
 -add animations
 =condense code
+-replace modal tabs with icons
 */

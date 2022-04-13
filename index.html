@@ -22,20 +22,18 @@
 					<p class="h4">Dylan Barkowsky</p>
 				</div>
 				<div class="col-sm-4">
-					<span>Currency:</span>
 					<select class="form-select" name="currency" id="currency">
-						<option value="cad">CAD</option>
-						<option value="usd">USD</option>
-						<option value="eur">EUR</option>
-					  </select>
-				</div>
-				<div class="col-sm-2">
-					<button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><img class="cart-button" src="./images/cart.jpg" alt=""></button>
+						<option value="cad">$ CAD</option>
+						<option value="usd">$ USD</option>
+						<option value="eur">€ EUR</option>
+					</select>
 				</div>
 			</div>
 			<!-- Wall div displays product cards-->
 			<div id="wall" class="row"></div>
 		</div>
+
+		<button type="button" id="open-cart" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><img class="cart-button" src="./images/cart.jpg" alt=""></button>
 
 		<!-- Offcanvas element for cart -->
 		<div class="offcanvas offcanvas-end px-3" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -66,7 +64,7 @@
 					<div class="modal-body container">
 						<!-- Navigation function removed from these tabs intentionally.
 							 Do not want users to circumvent field checking. -->
-						<ul class="nav nav-tabs" id="myTab" role="tablist">
+						<ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
 							<li class="nav-item" >
 							  	<p class="nav-link active" id="payment-tab"  aria-controls="payment" aria-selected="true">Pay</p>
 							</li>
@@ -83,23 +81,23 @@
 						<div class="tab-content" id="myTabContent">
 							<div class="tab-pane fade show active" id="payment" role="tabpanel" aria-labelledby="payment-tab">
 								<form action="">
-									<div class="row">
+									<div class="row mt-2">
 										<div class="form-container col-8">
-											<label class="form-label" for="cc-number">CC Number</label>
-											<input class="form-control" type="text" id="cc-number">
-											<div class="feedback" id="cc-number-feedback">bad</div>
+											<label class="form-label" for="cc-number">Card Number</label>
+											<input class="form-control" type="text" id="cc-number" placeholder="e.g. 4111 1111 1111 1111">
+											<div class="feedback" id="cc-number-feedback">Must be a valid 16-digit number.</div>
 										</div>
 										<div class="form-container col-4">
 											<label class="form-label" for="cc-cvc">CVC</label>
-											<input class="form-control" type="text" id="cc-cvc">
-											<div class="feedback" id="cc-cvc-feedback">bad</div>
+											<input class="form-control" type="text" id="cc-cvc" placeholder="e.g. 123">
+											<div class="feedback" id="cc-cvc-feedback">Must be a number of 3 or 4 digits.</div>
 										</div>
 									</div>
-									<div class="row">
-										<label class="form-label">MM / YY</label>
+									<div class="row mt-3">
+										<label class="form-label">Expiry Date (MM/YY)</label>
 									</div>	
 									<div class="row">
-										<div class="form-container col-3">
+										<div class="form-container col-4">
 											<select class="form-select" id="cc-month">
 												<option value="01">01</option>
 												<option value="02">02</option>
@@ -116,7 +114,7 @@
 											</select>
 										</div>
 										/
-										<div class="form-container col-3">
+										<div class="form-container col-4">
 											<select class="form-select" id="cc-year">
 												<option value="22">22</option>
 												<option value="23">23</option>
@@ -133,146 +131,148 @@
 											</select>
 										</div>
 									</div>
-									<div id="cc-expiry-feedback" class="col-12 feedback">bad</div>
+									<div id="cc-expiry-feedback" class="col-12 feedback">Date cannot be in the past.</div>
 								</form>
-								<div class="modal-buttons">
+								<div class="modal-buttons my-3">
 									<button type="button" class="btn btn-primary" id="payment-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="billing-tab">
 								<form action="">
 									<div class="row">
-										<div class="form-container col-sm-6">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="bill-email">Email</label>
-											<input class="form-control" type="text" id="bill-email">
-											<div class="feedback" id="bill-email-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-email" placeholder="e.g. myemail@example.com">
+											<div class="feedback" id="bill-email-feedback">Email not valid. Please follow format myemail@example.com</div>
 										</div>
-										<div class="form-container col-sm-6">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="bill-phone">Phone</label>
-											<input class="form-control" type="text" id="bill-phone">
-											<div class="feedback" id="bill-phone-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-phone" placeholder="e.g. 123-456-7890">
+											<div class="feedback" id="bill-phone-feedback">Please enter valid 10-digit phone number.</div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="form-container col-md-6">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="bill-fname">First Name</label>
-											<input class="form-control" type="text" id="bill-fname">
-											<div class="feedback" id="bill-fname-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-fname" placeholder="e.g. Ricky">
+											<div class="feedback" id="bill-fname-feedback">Names must only be alphabetic characters. Spaces and hyphens may be used within.</div>
 										</div>
-										<div class="form-container col-md-6">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="bill-lname">Last Name</label>
-											<input class="form-control" type="text" id="bill-lname">
-											<div class="feedback" id="bill-lname-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-lname" placeholder="e.g. Bobby">
+											<div class="feedback" id="bill-lname-feedback">Names must only be alphabetic characters. Spaces and hyphens may be used within.</div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="form-container col-3">
+										<div class="form-container col-3 mt-3">
 											<label class="form-label" for="bill-apt">Apt/Suite</label>
-											<input class="form-control" type="text" id="bill-apt">
-											<div class="feedback" id="bill-apt-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-apt" placeholder="e.g. 12A">
+											<div class="feedback" id="bill-apt-feedback">Please enter the field with only numbers or letters.</div>
 										</div>
-										<div class="form-container col-3">
+										<div class="form-container col-5 mt-3">
 											<label class="form-label" for="bill-housenumber">House Number</label>
-											<input class="form-control" type="text" id="bill-housenumber">
-											<div class="feedback" id="bill-housenumber-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-housenumber" placeholder="e.g. 3596">
+											<div class="feedback" id="bill-housenumber-feedback">Please enter the field using only numbers or letters.</div>
 										</div>
 									</div>
-									<div class="row">
-										<div class="form-container col-9">
+									<div class="row mt-3">
+										<div class="form-container col-sm-9">
 											<label class="form-label" for="bill-street">Street</label>
-											<input class="form-control" type="text" id="bill-street">
-											<div class="feedback" id="bill-street-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-street" placeholder="e.g. MacKenzie Ave">
+											<div class="feedback" id="bill-street-feedback">Please enter a valid street. Avoid using special characters.</div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="form-container col-5">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="bill-city">City</label>
-											<input class="form-control" type="text" id="bill-city">
-											<div class="feedback" id="bill-city-feedback">bad</div>
+											<input class="form-control" type="text" id="bill-city" placeholder="e.g. Powell River">
+											<div class="feedback" id="bill-city-feedback">Please enter a valid city. Avoid using special characters.</div>
 										</div>
-										<div class="form-container col-2">
-											<label id="bill-province-label" class="form-label" for="bill-province">Province/State</label>
-											<select class="form-select" name="bill-province" id="bill-province">
-												<option value="AB">AB</option>
-												<option value="BC">BC</option>
-												<option value="MB">MB</option>
-												<option value="NB">NB</option>
-												<option value="NL">NL</option>
-												<option value="NS">NS</option>
-												<option value="NT">NT</option>
-												<option value="NU">NU</option>
-												<option value="ON">ON</option>
-												<option value="PE">PE</option>
-												<option value="QC">QC</option>
-												<option value="SK">SK</option>
-												<option value="YT">YT</option>
-											</select>
-											<div class="feedback" id="bill-province-feedback">bad</div>
-										</div>
-										<div class="form-container col-3">
-											<label class="form-label" for="bill-country">Country</label>
-											<select class="form-select" name="bill-country" id="bill-country">
-												<option value="CA">Canada</option>
-												<option value="US">USA</option>
-											</select>
-											<div class="feedback" id="bill-country-feedback">bad</div>
-										</div>
-										<div class="form-container col-3">
-											<label id="bill-postal-label" class="form-label" for="bill-postal">Postal Code</label>
-											<input class="form-control" type="text" id="bill-postal">
-											<div class="feedback" id="bill-postal-feedback">bad</div>
+										<div class="row">
+											<div class="form-container col-4 mt-3">
+												<label id="bill-province-label" class="form-label" for="bill-province">Province/State</label>
+												<select class="form-select" name="bill-province" id="bill-province">
+													<option value="AB">AB</option>
+													<option value="BC">BC</option>
+													<option value="MB">MB</option>
+													<option value="NB">NB</option>
+													<option value="NL">NL</option>
+													<option value="NS">NS</option>
+													<option value="NT">NT</option>
+													<option value="NU">NU</option>
+													<option value="ON">ON</option>
+													<option value="PE">PE</option>
+													<option value="QC">QC</option>
+													<option value="SK">SK</option>
+													<option value="YT">YT</option>
+												</select>
+												<div class="feedback" id="bill-province-feedback">Please select a province or state.</div>
+											</div>
+											<div class="form-container col-5 mt-3">
+												<label class="form-label" for="bill-country">Country</label>
+												<select class="form-select" name="bill-country" id="bill-country">
+													<option value="CA">Canada</option>
+													<option value="US">USA</option>
+												</select>
+												<div class="feedback" id="bill-country-feedback">Please select a country.</div>
+											</div>
+											<div class="form-container col-sm-6 mt-3">
+												<label id="bill-postal-label" class="form-label" for="bill-postal">Postal Code</label>
+												<input class="form-control" type="text" id="bill-postal" placeholder="e.g. V8A 3E8 OR 12345">
+												<div class="feedback" id="bill-postal-feedback">Please double check that postal/ZIP code.</div>
+											</div>
 										</div>
 									</div>
 								</form>
-								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary" id="billing-prev">Previous</button>
+								<div class="modal-buttons mt-3">
+									<button type="button" class="btn btn-secondary" id="billing-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="billing-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
 								<form action="">
-									<div class="row">
-										<input id="same-shipping" type="checkbox">
-										<label for="same-shipping">My shipping address matches my billing address.</label>
+									<div class="row mt-3" id="same-shipping-div">
+										<input class="col-1" id="same-shipping" type="checkbox">
+										<label class="col" for="same-shipping">My shipping address matches my billing address.</label>
 									</div>
 									<div class="row">
-										<div class="form-container col-md-6">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="ship-fname">First Name</label>
-											<input class="form-control" type="text" id="ship-fname">
-											<div class="feedback" id="ship-fname-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-fname" placeholder="e.g. Ricky">
+											<div class="feedback" id="ship-fname-feedback">Names must only be alphabetic characters. Spaces and hyphens may be used within.</div>
 										</div>
-										<div class="form-container col-md-6">
+										<div class="form-container col-sm-6 mt-3">
 											<label class="form-label" for="ship-lname">Last Name</label>
-											<input class="form-control" type="text" id="ship-lname">
-											<div class="feedback" id="ship-lname-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-lname" placeholder="e.g. Bobby">
+											<div class="feedback" id="ship-lname-feedback">Names must only be alphabetic characters. Spaces and hyphens may be used within.</div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="form-container col-3">
+										<div class="form-container col-3 mt-3">
 											<label class="form-label" for="ship-apt">Apt/Suite</label>
-											<input class="form-control" type="text" id="ship-apt">
-											<div class="feedback" id="ship-apt-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-apt" placeholder="e.g. 12A">
+											<div class="feedback" id="ship-apt-feedback">Please enter the field with only numbers or letters.</div>
 										</div>
-										<div class="form-container col-3">
+										<div class="form-container col-5 mt-3">
 											<label class="form-label" for="ship-housenumber">House Number</label>
-											<input class="form-control" type="text" id="ship-housenumber">
-											<div class="feedback" id="ship-housenumber-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-housenumber" placeholder="e.g. 3596">
+											<div class="feedback" id="ship-housenumber-feedback">Please enter the field using only numbers or letters.</div>
 										</div>
 									</div>
-									<div class="row">
-										<div class="form-container col-9">
+									<div class="row mt-3">
+										<div class="form-container col-sm-9">
 											<label class="form-label" for="ship-street">Street</label>
-											<input class="form-control" type="text" id="ship-street">
-											<div class="feedback" id="ship-street-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-street" placeholder="e.g. MacKenzie Ave">
+											<div class="feedback" id="ship-street-feedback">Please enter a valid street. Avoid using special characters.</div>
 										</div>
 									</div>
 									<div class="row">
-										<div class="form-container col-5">
+										<div class="form-container col-sm-5 mt-3">
 											<label class="form-label" for="ship-city">City</label>
-											<input class="form-control" type="text" id="ship-city">
-											<div class="feedback" id="ship-city-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-city" placeholder="e.g. Powell River">
+											<div class="feedback" id="ship-city-feedback">Please enter a valid city. Avoid using special characters.</div>
 										</div>
-										<div class="form-container col-2">
+										<div class="form-container col-4 mt-3">
 											<label id="ship-province-label" class="form-label" for="ship-province">Province/State</label>
 											<select class="form-select" name="ship-province" id="ship-province">
 												<option value="AB">AB</option>
@@ -289,58 +289,59 @@
 												<option value="SK">SK</option>
 												<option value="YT">YT</option>
 											</select>
-											<div class="feedback" id="ship-province-feedback">bad</div>
+											<div class="feedback" id="ship-province-feedback">Please select a province or state.</div>
 										</div>
-										<div class="form-container col-3">
+										<div class="form-container col-5 mt-3">
 											<label class="form-label" for="ship-country">Country</label>
 											<select class="form-select" name="ship-country" id="ship-country">
 												<option value="CA">Canada</option>
 												<option value="US">USA</option>
 											</select>
-											<div class="feedback" id="ship-country-feedback">bad</div>
+											<div class="feedback" id="ship-country-feedback">Please select a country.</div>
 										</div>
-										<div class="form-container col-3">
+										<div class="form-container col-sm-6 mt-3">
 											<label id="ship-postal-label" class="form-label" for="ship-postal">Postal Code</label>
-											<input class="form-control" type="text" id="ship-postal">
-											<div class="feedback" id="ship-postal-feedback">bad</div>
+											<input class="form-control" type="text" id="ship-postal" placeholder="e.g. V8A 3E8 OR 12345">
+											<div class="feedback" id="ship-postal-feedback">Please double check that postal/ZIP code.</div>
 										</div>
 									</div>
 								</form>
-								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary" id="shipping-prev">Previous</button>
+								<div class="modal-buttons mt-3">
+									<button type="button" class="btn btn-secondary" id="shipping-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="shipping-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="confirm" role="tabpanel" aria-labelledby="confirm-tab">
+								<h4 class="my-2">Your Cart</h3>
 								<div id="confirm-content"></div>
-								<div id="totals">
-									<div class="d-flex container-fluid justify-content-between">
+								<div id="totals mt-5">
+									<div class="d-flex container-fluid justify-content-between mt-1">
 										<div>Subtotal:</div><div id="confirm-subtotal">$0.00</div>
 									</div>
-									<div class="d-flex container-fluid justify-content-between">
+									<div class="d-flex container-fluid justify-content-between mt-1">
 										<div>Shipping:</div><div id="confirm-shipping">$0.00</div>
 									</div>
-									<div class="d-flex container-fluid justify-content-between">
+									<div class="d-flex container-fluid justify-content-between mt-1">
 										<div>Taxes:</div><div id="confirm-taxes">$0.00</div>
 									</div>
-									<div class="d-flex container-fluid justify-content-between">
+									<div class="d-flex container-fluid justify-content-between mt-1">
 										<div>Total:</div><div id="confirm-total">$0.00</div>
 									</div>
 								</div>
-								<div class="modal-buttons">
-									<button type="button" class="btn btn-primary" id="confirm-prev">Previous</button>
+								<div class="modal-buttons mt-3">
+									<button type="button" class="btn btn-secondary" id="confirm-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="confirm-final">Confirm</button>
 								</div>
-								<div id="fail-response">
-									<img src="" alt="Red X">
-									<p>We're sorry, but something has gone wrong.Try again soon.</p>
-									<p>If this problem persists, please call 605-475-6964 for assistance.</p>
-								</div>
+								<div id="fail-response"></div>
 							</div>
-							<div class="tab-pane fade" id="success-response" role="tabpanel" aria-labelledby="success-tab">
-								<img src="" alt="Green Shopping Cart">
-								<p>Your order was a success!</p>
-								<p>Expect your order in 2-3 days.</p>
+							<div class="tab-pane fade mt-3" id="success-response" role="tabpanel" aria-labelledby="success-tab">
+								<div class="row">
+									<div class="col" id="checkmark">✓</div>
+									<div class="col">
+										<p>Your order was a success!</p>
+										<p>Expect your order in 2-3 days.</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
