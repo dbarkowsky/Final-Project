@@ -57,9 +57,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title" id="exampleModalLongTitle">Checkout</h5>
-						<button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
+						<button type="button" class="close close-modal btn-close" data-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body container">
 						<!-- Navigation function removed from these tabs intentionally.
@@ -134,7 +132,7 @@
 									<div id="cc-expiry-feedback" class="col-12 feedback">Date cannot be in the past.</div>
 								</form>
 								<div class="modal-buttons my-3">
-									<button type="button" class="btn btn-primary" id="payment-next">Next</button>
+									<button type="button" class="btn btn-primary float-end" id="payment-next">Next</button>
 								</div>
 							</div>
 							<div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="billing-tab">
@@ -224,7 +222,7 @@
 										</div>
 									</div>
 								</form>
-								<div class="modal-buttons mt-3">
+								<div class="modal-buttons mt-3 d-flex justify-content-between">
 									<button type="button" class="btn btn-secondary" id="billing-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="billing-next">Next</button>
 								</div>
@@ -306,7 +304,7 @@
 										</div>
 									</div>
 								</form>
-								<div class="modal-buttons mt-3">
+								<div class="modal-buttons mt-3 d-flex justify-content-between">
 									<button type="button" class="btn btn-secondary" id="shipping-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="shipping-next">Next</button>
 								</div>
@@ -314,21 +312,21 @@
 							<div class="tab-pane fade" id="confirm" role="tabpanel" aria-labelledby="confirm-tab">
 								<h4 class="my-2">Your Cart</h3>
 								<div id="confirm-content"></div>
-								<div id="totals mt-5">
-									<div class="d-flex container-fluid justify-content-between mt-1">
-										<div>Subtotal:</div><div id="confirm-subtotal">$0.00</div>
+								<div id="totals" class="mt-3">
+									<div class="total-row d-flex container-fluid justify-content-between mt-1">
+										<div class="total-title">Subtotal:</div><div id="confirm-subtotal">$0.00</div>
 									</div>
-									<div class="d-flex container-fluid justify-content-between mt-1">
-										<div>Shipping:</div><div id="confirm-shipping">$0.00</div>
+									<div class="total-row d-flex container-fluid justify-content-between mt-1">
+										<div class="total-title">Shipping:</div><div id="confirm-shipping">$0.00</div>
 									</div>
-									<div class="d-flex container-fluid justify-content-between mt-1">
-										<div>Taxes:</div><div id="confirm-taxes">$0.00</div>
+									<div class="total-row d-flex container-fluid justify-content-between mt-1">
+										<div class="total-title">Taxes:</div><div id="confirm-taxes">$0.00</div>
 									</div>
-									<div class="d-flex container-fluid justify-content-between mt-1">
-										<div>Total:</div><div id="confirm-total">$0.00</div>
+									<div class="total-row d-flex container-fluid justify-content-between mt-1">
+										<div class="total-title">Total:</div><div class="total-title" id="confirm-total">$0.00</div>
 									</div>
 								</div>
-								<div class="modal-buttons mt-3">
+								<div class="modal-buttons mt-3 d-flex justify-content-between">
 									<button type="button" class="btn btn-secondary" id="confirm-prev">Previous</button>
 									<button type="button" class="btn btn-primary" id="confirm-final">Confirm</button>
 								</div>
@@ -336,7 +334,7 @@
 							</div>
 							<div class="tab-pane fade mt-3" id="success-response" role="tabpanel" aria-labelledby="success-tab">
 								<div class="row">
-									<div class="col" id="checkmark">✓</div>
+									<div class="col-3" id="checkmark">✓</div>
 									<div class="col">
 										<p>Your order was a success!</p>
 										<p>Expect your order in 2-3 days.</p>

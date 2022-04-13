@@ -647,18 +647,26 @@ async function sendData(){
             //print error message to screen instead?
             console.log("brandon no likey");
             //let customer know
-            $("#fail-response").html(`<img src="" alt="Red X"> \
-                                <p>We're sorry, but there is an unknown error with the data being sent.</p> \
-                                <p>If this problem persists, please call 605-475-6964 for assistance.</p>`);
+            $("#fail-response").html(`<div class="row">
+                                        <div class="col-4" id="sad-face">(；′⌒\`)</div>
+                                        <div class="col">
+                                            <p>Something appears to be odd with the fields provided.</p>
+                                            <p>Please double-check your information and try again.</p>
+                                        </div>
+                                    </div>`);
             $("#fail-response").fadeIn(1000); 
         } 
     }).catch(error => {
         //if post is NOT successful
         console.log(error);
         //let customer know
-        $("#fail-response").html(`<img src="" alt="Red X"> \
-                                <p>We're sorry, but something has gone wrong. Try again soon.</p> \
-                                <p>If this problem persists, please call 605-475-6964 for assistance.</p>`);
+        $("#fail-response").html(`<div class="row">
+                                    <div class="col-4" id="sad-face">┗( T﹏T )┛</div>
+                                    <div class="col">
+                                        <p>We're sorry, but our server is not responding. Try again soon.</p> 
+                                        <p>If this problem persists, please call 605-475-6964 for assistance.</p>
+                                    </div>
+                                </div>`);
         $("#fail-response").fadeIn(1000);  
     });
 }
@@ -1087,11 +1095,11 @@ $(document).ready(function (){
 
 /* TODO:
 Required:
+-closing modal or going back from confirm should hide error response text
 -make site look nicer
     -fix #wall so it displays nicely
     -stylize wall page
     -stylize cards
-    -make response text look good
 -add comments
 
 
