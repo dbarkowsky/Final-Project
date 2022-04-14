@@ -1,4 +1,8 @@
-//easy object to hold json pointer
+/*****************************************************************/
+/************************* Classes *******************************/
+/*****************************************************************/
+
+//Easy object to hold json pointers
 class JSONHolder {
     _products;
     _currencies;
@@ -18,9 +22,16 @@ class JSONHolder {
     set currencies(pointer){
         this._currencies = pointer;
     }
+
+    getItem(id) {
+        for (let x in this.products){
+            if (this.products[x].id == id)
+                return this.products[x];
+        }
+    }
 }
 
-//class that represents the cart and does cart functions
+//Class that represents the cart and does cart functions
 class Cart {
     _cartList;
     _totalPrice;
@@ -51,6 +62,10 @@ class Cart {
         this._orderData = jsonObject;
     }
 
+    set cartList(list){
+        this._cartList = list;
+    }
+
     addEntry(item){
         this._cartList.push(item);
     }
@@ -64,17 +79,25 @@ class Cart {
         }
     }
 
+    //Calculates total value of cart before tax, etc. In CAD
     calculateTotal(){
         let tempTotal = 0;
         for (let x in this.cartList){
             tempTotal += parseFloat(this.cartList[x].sum);
-            console.log("entry price " + this.cartList[x].sum);
-            console.log("tempTotal " + tempTotal);
         }
         this.totalPrice = parseFloat(tempTotal).toFixed(2);
-        console.log(`total price ${this.totalPrice}`);
     }
 
+    //Calculates total number of items in cart and returns value
+    calculateTotalQuantity(){
+        let tempTotal = 0;
+        for (let x in this.cartList){
+            tempTotal += parseFloat(this.cartList[x].quantity);
+        }
+        return tempTotal;
+    }
+
+    //Checks if an entry already exists; returns a boolean
     entryExists(tempEntry){
         for (let entry in this.cartList){
             if (this.cartList[entry].id == tempEntry.id){
@@ -84,6 +107,7 @@ class Cart {
         return false;
     }
 
+    //Finds an entry and increments its quantity
     incrementEntry(id){
         for (let entry in this.cartList){
             if (this.cartList[entry].id == id){
@@ -94,11 +118,13 @@ class Cart {
         }
     }
 
+    //Emptys the cart
     empty(){
         this._cartList = [];
         drawCart();
     }
 
+    //Checks for an empty cart
     isEmpty(){
         if (this._cartList.length < 1){
             return true;
@@ -109,7 +135,7 @@ class Cart {
 
 }
 
-//class for each item type in the cart
+//Class for each item type in the cart
 class CartEntry {
     _quantity;
     _item;
@@ -153,475 +179,39 @@ class CartEntry {
         this._quantity--;
     }
 
+    //Calculates the total price of this item type in cart
     calculateSum(){
         this._sum = this._item.price * this._quantity;
     }
 }
 
-//Waits for API calls, then loads tiles into view
-function drawCards(){
-    $("#wall").empty();
-    let priceModifier = apis.currencies.cad[$("#currency").val()];
-    let currencySymbol = buildCurrencySymbols();
+/*****************************************************************/
+/*************** Functions for Getting/Sending Data **************/
+/*****************************************************************/
 
-    for (item in apis.products){
-        $("#wall").append(` \
-        <div class="card col-md-4 mx-auto my-4"> \
-            <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
-            <div class="card-body"> \
-                <h5 class="card-title">${apis.products[item].title}</h5> \
-                <p class="card-text">${currencySymbol[$("#currency").val()]}${convertPrice(apis.products[item].price,priceModifier).toFixed(2)}</p> \
-                <p class="card-text" data-config="{ 'type': 'text', 'limit': 5, 'more': '&#8594; show more', 'less': '&#8592; less' }">${apis.products[item].description}</p> \
-                <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
-            </div> \
-        </div>`);
-    }
-
-    //attach listener to button
-    $(".card-button").on("click", addToCart);
-    
-    console.log("end loadTiles");
-}
-
+//Gets APIs and assigns them to the APIs class instance
 async function getAPICalls(){
-    //get api calls
-    apis.currencies = await loadAPI("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/cad.json");
-
     try {
-        //real api from fakestoreapi
+        //real API from fakestoreapi
         apis.products = await loadAPI("https://fakestoreapi.com/products");
     } catch (e){
-        //backup api from school's server
+        //backup API from school's server
         apis.products = await loadAPI("https://deepblue.camosun.bc.ca/~c0180354/ics128/final/fakestoreapi.json");
     }
-
-    console.log(apis.products);
-    console.log(apis.currencies);
+    //get currency API call
+    apis.currencies = await loadAPI("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/cad.json");
 }
 
+//Helper function to get APIs
 async function loadAPI(url){
     let response = await fetch(url);
     return await response.json();
 }
 
-function convertPrice(original, modifier){
-    return parseFloat((original * modifier).toFixed(2));
-}
-
-function validateField(expression, string){
-    expression = new RegExp(expression);
-    string = string.trim();
-    console.log("in validate");
-
-    if(expression.test(string)){
-        console.log(`${string} matches the expression`);
-        return true;
-    }
-    console.log(`${string} doesn't match the expression`);
-    return false;
-}
-
-//logical cart functions
-function addToCart(){
-    console.log("adding to cart");
-    console.log(`adding item ${this.value} to cart`);
-
-    let tempEntry = new CartEntry(apis.products[this.value-1]);
-    //does this item already exist?
-    if (cart.entryExists(tempEntry)){
-        console.log("entry exists");
-        //just increment that entry's quantity by 1
-        cart.incrementEntry(tempEntry.id);
-    } else {
-        console.log("entry is new");
-        cart.addEntry(tempEntry);
-        console.log(`current item: ${tempEntry.id}`);
-    }
-    cart.calculateTotal();
-    console.log(`current total ${cart.totalPrice}`);
-    drawCart();
-    console.log(`current cart: ${cart.cartList}`);
-    $("#cart-checkout").removeAttr("disabled");
-}
-
-function removeFromCart(){
-    console.log("removing from cart");
-    $(this).closest(".cart-box").remove();
-    cart.removeEntry(this.id);
-    cart.calculateTotal();
-    $("#cart-subtotal").html(`$${parseFloat(cart.totalPrice).toFixed(2)}`);
-    //if cart is empty, disable checkout
-    if (cart.isEmpty()){
-        $("#cart-checkout").attr("disabled", "true");
-    }
-}
-
-function createCartObject(id){
-    let cartObject = apis.products[id];
-    return cartObject;
-}
-
-//physical cart functions
-function drawCart(){
-    let priceModifier = apis.currencies.cad[$("#currency").val()];
-    let currencySymbol = buildCurrencySymbols();
-    $(".offcanvas-body").empty();
-    for (entry in cart.cartList){    
-        $(".offcanvas-body").append(`<div class="cart-box row mb-4" id="${cart.cartList[entry].id}"> 
-                                        <div class="col-4">
-                                            <img src="${cart.cartList[entry].item.image}" alt="..."> 
-                                        </div>
-                                        <div class="col">
-                                            <button type="button" class="cart-remove btn btn-secondary" aria-label="Close" id="${cart.cartList[entry].id}">–</button>
-                                            <p class="cart-title">${cart.cartList[entry].item.title}</p> 
-                                            <div class="d-flex row justify-content-between">
-                                                <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
-                                                <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
-                                            </div>  
-                                        </div>
-                                    </div>`);
-    }
-    //set subtotal
-    console.log(cart.totalPrice);
-    $("#cart-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
-    //add functions to all buttons
-    $(".cart-remove").on("click", removeFromCart);
-}
-
-function emptyCart(){
-    $(".offcanvas-body").empty();
-    cart.empty();
-    cart.calculateTotal();
-    $("#cart-subtotal").html(`$${parseFloat(cart.totalPrice).toFixed(2)}`);
-    $("#cart-checkout").attr("disabled", "true");
-}
-
-function checkout(){
-        //don't draw modal here. Needs tax info, which might not be set.
-        $(".tab-pane.show").removeClass("show active");
-        $(".nav-link.active").removeClass("active").attr("selected", "false");
-        $(".tab-pane#payment").addClass("show active");
-        $(".nav-link#payment-tab").addClass("active").attr("selected", "true");
-        $("#checkout-modal").modal("show");
-}
-
-//modal section functions
-function closeModal(){
-    $("#checkout-modal").modal("hide");
-}
-
-function drawConfirmModal(){
-    let priceModifier = apis.currencies.cad[$("#currency").val()];
-    let currencySymbol = buildCurrencySymbols();
-    let taxes = buildTaxData();
-    console.log(taxes);
-    $("#confirm-content").empty();
-    for (entry in cart.cartList){    
-        $("#confirm-content").append(`<div class="confirm-box row" id="confirm-${cart.cartList[entry].id}">  
-                                        <div class="col-3">
-                                            <img src="${cart.cartList[entry].item.image}" alt="..."> 
-                                        </div>
-                                        <div class="col">
-                                        <p class="cart-title">${cart.cartList[entry].item.title}</p> 
-                                        <div class="d-flex row justify-content-between">
-                                            <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
-                                            <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
-                                        </div>  
-                                    </div>
-                                </div>`);
-    }
-
-    //taxes are based on the shipping address
-    let country = ($("#ship-country").val()).toUpperCase();
-    let province = $("#ship-province").val();
-
-    console.log(`current tax: ${taxes[country][province]}`);
-    //flat rate of $5 for shipping, not converted for currency. Shipping is taxable.
-    $("#confirm-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
-    $("#confirm-shipping").html(`${currencySymbol[$("#currency").val()]}5.00`);
-    $("#confirm-taxes").html(`${currencySymbol[$("#currency").val()]}${((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]).toFixed(2)}`);
-    $("#confirm-total").html(`${currencySymbol[$("#currency").val()]}${(convertPrice(cart.totalPrice, priceModifier) + ((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]) + 5).toFixed(2)}`);
-}
-
-//modal prev-next buttons
-function paymentNext(){
-    let verificationPassed = true;
-    let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*$";
-    let ccCVCRegex = "(^[0-9]{3}$)";
-    let ccExpiryRegex = "^[0-9]{2}$";
-
-    //If the credit card field is not valid
-    if (!validateField(ccNumberRegex, $("#cc-number").val())){
-        $("#cc-number-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#cc-number-feedback").fadeOut(250);
-    }
-
-    //If the CVC field is not valid
-    if (!validateField(ccCVCRegex, $("#cc-cvc").val())){
-        $("#cc-cvc-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#cc-cvc-feedback").fadeOut(250);
-    }
-
-    //If the Expiry fields are not valid
-    if (!validateField(ccExpiryRegex, $("#cc-month").val()) || !validateField(ccExpiryRegex, $("#cc-year").val()) || 
-        new Date(`20${$("#cc-year").val()}`, $("#cc-month").val()) < new Date()){
-        $("#cc-expiry-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#cc-expiry-feedback").fadeOut(250);
-    }
-
-
-    if (verificationPassed){
-        $("#payment").removeClass("show active");
-        $("#billing").addClass("show active");
-        $("#payment-tab").removeClass("active").attr("selected", "false");
-        $("#billing-tab").addClass("active").attr("selected", "true");
-    }
-}
-
-function billingPrev(){
-    $("#billing").removeClass("show active");
-    $("#payment").addClass("show active");
-    $("#billing-tab").removeClass("active").attr("selected", "false");
-    $("#payment-tab").addClass("active").attr("selected", "true");
-}
-
-function billingNext(){
-    let verificationPassed = true;
-    let nameRegex = "^[A-Za-z\\s-]+[a-z]+$";
-    let aptRegex = "^[0-9A-Za-z]*$";
-    let numberRegex = "^[0-9]+[A-Z]*$";
-    let wordRegex = "^[A-Za-z\\s-\\.-]+[A-Za-z]+$";
-    let postalRegex;
-    if ($("#bill-country").val() == "CA")
-        postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
-    else 
-        postalRegex = "^[0-9]{5}$";
-    let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
-    let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
-
-    //check email field
-    if (!validateField(emailRegex, $("#bill-email").val())){
-        $("#bill-email-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-email-feedback").fadeOut(250);
-    }
-
-    //check phone field
-    if (!validateField(phoneRegex, $("#bill-phone").val())){
-        $("#bill-phone-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-phone-feedback").fadeOut(250);
-    }
-
-    //check first name field
-    if (!validateField(nameRegex, $("#bill-fname").val())){
-        $("#bill-fname-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-fname-feedback").fadeOut(250);
-    }
-
-    //check last name field
-    if (!validateField(nameRegex, $("#bill-lname").val())){
-        $("#bill-lname-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-lname-feedback").fadeOut(250);
-    }
-
-    //check apt field
-    if (!validateField(aptRegex, $("#bill-apt").val())){
-        $("#bill-apt-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-apt-feedback").fadeOut(250);
-    }
-
-    //check house number field
-    if (!validateField(numberRegex, $("#bill-housenumber").val())){
-        $("#bill-housenumber-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-housenumber-feedback").fadeOut(250);
-    }
-
-    //check street field
-    if (!validateField(wordRegex, $("#bill-street").val())){
-        $("#bill-street-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-street-feedback").fadeOut(250);
-    }
-
-    //check city field
-    if (!validateField(wordRegex, $("#bill-city").val())){
-        $("#bill-city-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-city-feedback").fadeOut(250);
-    }
-
-     //check if province was selected
-     if ($("#bill-province").val() == null){
-        $("#bill-province-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-province-feedback").fadeOut(250);
-    }
-
-    //check if country was selected
-    if ($("#bill-country").val() == null){
-        $("#bill-country-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-country-feedback").fadeOut(250);
-    }
-
-    //check postal field
-    if (!validateField(postalRegex, $("#bill-postal").val().toUpperCase())){
-        $("#bill-postal-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#bill-postal-feedback").fadeOut(250);
-    }
-
-    if (verificationPassed){
-        $("#billing").removeClass("show active");
-        $("#shipping").addClass("show active");
-        $("#billing-tab").removeClass("active").attr("selected", "false");
-        $("#shipping-tab").addClass("active").attr("selected", "true");
-        billToShipCheckbox();
-    }
-}
-
-function shippingPrev(){
-    $("#shipping").removeClass("show active");
-    $("#billing").addClass("show active");
-    $("#shipping-tab").removeClass("active").attr("selected", "false");
-    $("#billing-tab").addClass("active").attr("selected", "true");
-    //reset checkbox and values of shipping page
-    $("#same-shipping").prop("checked", false);
-    billToShipCheckbox();
-}
-
-function shippingNext(){
-
-    let verificationPassed = true;
-    let nameRegex = "^[A-Za-z\\s-]+[a-z]+$";
-    let aptRegex = "^[0-9]*$";
-    let numberRegex = "^[0-9]+[A-Z]*$";
-    let wordRegex = "^[A-Za-z\\s-\.-]+[A-Za-z]+$";
-    let postalRegex;
-    if ($("#bill-country").val() == "CA")
-        postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
-    else 
-        postalRegex = "^[0-9]{5}$";
-    
-    //check first name field
-    if (!validateField(nameRegex, $("#ship-fname").val())){
-        $("#ship-fname-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-fname-feedback").fadeOut(250);
-    }
-
-    //check last name field
-    if (!validateField(nameRegex, $("#ship-lname").val())){
-        $("#ship-lname-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-lname-feedback").fadeOut(250);
-    }
-
-    //check apt field
-    if (!validateField(aptRegex, $("#ship-apt").val())){
-        $("#ship-apt-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-apt-feedback").fadeOut(250);
-    }
-
-    //check house number field
-    if (!validateField(numberRegex, $("#ship-housenumber").val())){
-        $("#ship-housenumber-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-housenumber-feedback").fadeOut(250);
-    }
-
-    //check street field
-    if (!validateField(wordRegex, $("#ship-street").val())){
-        $("#ship-street-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-street-feedback").fadeOut(250);
-    }
-
-    //check city field
-    if (!validateField(wordRegex, $("#ship-city").val())){
-        $("#ship-city-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-city-feedback").fadeOut(250);
-    }
-
-    //check if province was selected
-    if ($("#ship-province").val() == null){
-        $("#ship-province-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-province-feedback").fadeOut(250);
-    }
-
-    //check if country was selected
-    if ($("#ship-country").val() == null){
-        $("#ship-country-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-country-feedback").fadeOut(250);
-    }
-
-    //check postal field
-    if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
-        $("#ship-postal-feedback").fadeIn(250);
-        verificationPassed = false;
-    } else {
-        $("#ship-postal-feedback").fadeOut(250);
-    }
-
-    if (verificationPassed){
-        drawConfirmModal();
-        $("#shipping").removeClass("show active");
-        $("#confirm").addClass("show active");
-        $("#shipping-tab").removeClass("active").attr("selected", "false");
-        $("#confirm-tab").addClass("active").attr("selected", "true");
-    }
-}
-
-function confirmPrev(){
-    $("#confirm").removeClass("show active");
-    $("#shipping").addClass("show active");
-    $("#confirm-tab").removeClass("active").attr("selected", "false");
-    $("#shipping-tab").addClass("active").attr("selected", "true");
-}
-
-function confirmFinal(){
-    //time to submit json data
-    sendData();
-}
-
+//Sends order data to the server
 async function sendData(){
     //build object to send
     cart.orderData = await buildOrderData();
-    console.log(cart.orderData);
     let form_data = new FormData();
     form_data.append("submission", JSON.stringify(cart.orderData));
     //sending data to server
@@ -629,11 +219,9 @@ async function sendData(){
         method: "POST",
         body: form_data
     }).then(async response => {
-        console.log(response);
         try {
             //was response successful?
             let brandonsResponse = await response.json();
-            console.log(brandonsResponse);
             if (brandonsResponse.status == "NOT SUBMITTED"){
                 throw new Error("Some sent data was in a format not expected by the server.");
             }
@@ -644,8 +232,6 @@ async function sendData(){
             $("#confirm").removeClass("show active");
             $("#success-response").addClass("show active");
         } catch (e) {
-            //print error message to screen instead?
-            console.log("brandon no likey");
             //let customer know
             $("#fail-response").html(`<div class="row">
                                         <div class="col-4" id="sad-face">(；′⌒\`)</div>
@@ -658,7 +244,6 @@ async function sendData(){
         } 
     }).catch(error => {
         //if post is NOT successful
-        console.log(error);
         //let customer know
         $("#fail-response").html(`<div class="row">
                                     <div class="col-4" id="sad-face">┗( T﹏T )┛</div>
@@ -671,15 +256,20 @@ async function sendData(){
     });
 }
 
-
+//Returns an object that represents the order data.
 function buildOrderData(){
     let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let taxes = buildTaxData();
+    //taxes are based on the shipping address
+    let country = ($("#ship-country").val()).toUpperCase();
+    let province = $("#ship-province").val();
+
     let orderData = { 
         card_number: $("#cc-number").val().trim().replaceAll(/\s/g,''),
         expiry_month: $("#cc-month").val(),
         expiry_year: `20${$("#cc-year").val()}`,
         security_code: $("#cc-cvc").val().trim(),
-        amount: (convertPrice(cart.totalPrice, priceModifier) + (convertPrice(cart.totalPrice, priceModifier)*0.12) + 5).toFixed(2),
+        amount: (convertPrice(cart.totalPrice, priceModifier) + ((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]) + 5).toFixed(2),
         currency: $("#currency").val(),
         billing: {
             first_name: $("#bill-fname").val().trim(),
@@ -708,6 +298,528 @@ function buildOrderData(){
     return orderData;
 }
 
+/*******************************************************************/
+/************ Functions for Setting/Getting Cookies ****************/
+/*******************************************************************/
+
+//Saves cart to cookie
+function saveCookie(){
+    set_cookie("cartCookie", JSON.stringify(cart.cartList));
+}
+
+//Loads values from cookie
+function loadCookie(){
+    let list = JSON.parse(get_cookie("cartCookie"));
+    for (let x in list){
+        for (let y = 0; y < list[x]._quantity; y++){
+            addToCartFromCookie(list[x]._item.id);
+        }
+    }
+    
+    cart.calculateTotal();
+    drawCart();
+    updateCartNotifier();
+}
+
+//Adds item to cart when loading cookie only
+function addToCartFromCookie(id){
+    let tempEntry = new CartEntry(apis.getItem(id));
+    //does this item already exist?
+    if (cart.entryExists(tempEntry)){
+        //just increment that entry's quantity by 1
+        cart.incrementEntry(tempEntry.id);
+    } else {
+        //entry is new
+        cart.addEntry(tempEntry);
+    }
+    //recalculate and redraw cart
+    cart.calculateTotal();
+    drawCart();
+    $("#cart-checkout").removeAttr("disabled");
+}
+
+/*****************************************************************/
+/************ Functions for Manipulating the Cart ****************/
+/*****************************************************************/
+
+//Adds item to cart
+function addToCart(){
+    let tempEntry = new CartEntry(apis.getItem(this.value));
+    //does this item already exist?
+    if (cart.entryExists(tempEntry)){
+        //just increment that entry's quantity by 1
+        cart.incrementEntry(tempEntry.id);
+    } else {
+        //entry is new
+        cart.addEntry(tempEntry);
+    }
+    //recalculate and redraw cart
+    cart.calculateTotal();
+    drawCart();
+    $("#cart-checkout").removeAttr("disabled");
+    updateCartNotifier();
+    saveCookie();
+}
+
+//Removes item from cart
+function removeFromCart(){
+    $(this).closest(".cart-box").remove();
+    cart.removeEntry(this.id);
+    cart.calculateTotal();
+    $("#cart-subtotal").html(`$${parseFloat(cart.totalPrice).toFixed(2)}`);
+    //if cart is empty, disable checkout
+    if (cart.isEmpty()){
+        $("#cart-checkout").attr("disabled", "true");
+    }
+    updateCartNotifier();
+    saveCookie();
+}
+
+//Creates logical cart object
+function createCartObject(id){
+    let cartObject = apis.products[id];
+    return cartObject;
+}
+
+//Empties the cart
+function emptyCart(){
+    $(".offcanvas-body").empty();
+    cart.empty();
+    saveCookie();
+    updateCartNotifier();
+    cart.calculateTotal();
+    $("#cart-subtotal").html(`$${parseFloat(cart.totalPrice).toFixed(2)}`);
+    $("#cart-checkout").attr("disabled", "true");
+}
+
+/*****************************************************************/
+/************* Functions for Drawing On-screen Objects ***********/
+/*****************************************************************/
+
+//Waits for API calls, then loads tiles into view
+function drawCards(){
+    $("#wall").empty();
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let currencySymbol = buildCurrencySymbols();
+
+    //Draws cards onto #wall
+    for (item in apis.products){
+        $("#wall").append(` \
+        <div class="card col-md-4 mx-auto my-4"> \
+            <img src="${apis.products[item].image}" class="card-img-top" alt="..."> \
+            <div class="card-body"> \
+                <h5 class="card-title">${apis.products[item].title}</h5> \
+                <p class="card-text">${currencySymbol[$("#currency").val()]}${convertPrice(apis.products[item].price,priceModifier).toFixed(2)}</p> \
+                <p class="card-text" data-config="{ 'type': 'text', 'limit': 5, 'more': '&#8594; show more', 'less': '&#8592; less' }">${apis.products[item].description}</p> \
+                <button class="btn btn-primary card-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" value="${apis.products[item].id}">Add to Cart</button> \
+            </div> \
+        </div>`);
+    }
+
+    //attach listener to buttons
+    $(".card-button").on("click", addToCart);
+}
+
+//Redraws the cart
+function drawCart(){
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let currencySymbol = buildCurrencySymbols();
+    $(".offcanvas-body").empty();
+    for (entry in cart.cartList){    
+        $(".offcanvas-body").append(`<div class="cart-box row mb-4" id="${cart.cartList[entry].id}"> 
+                                        <div class="col-4">
+                                            <img src="${cart.cartList[entry].item.image}" alt="..."> 
+                                        </div>
+                                        <div class="col">
+                                            <button type="button" class="cart-remove btn btn-secondary" aria-label="Close" id="${cart.cartList[entry].id}">–</button>
+                                            <p class="cart-title">${cart.cartList[entry].item.title}</p> 
+                                            <div class="d-flex row justify-content-between">
+                                                <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
+                                                <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
+                                            </div>  
+                                        </div>
+                                    </div>`);
+    }
+    //set subtotal
+    $("#cart-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
+    //add functions to all buttons
+    $(".cart-remove").on("click", removeFromCart);
+}
+
+//Draws final page of modal
+function drawConfirmModal(){
+    let priceModifier = apis.currencies.cad[$("#currency").val()];
+    let currencySymbol = buildCurrencySymbols();
+    let taxes = buildTaxData();
+    $("#confirm-content").empty();
+    for (entry in cart.cartList){    
+        $("#confirm-content").append(`<div class="confirm-box row" id="confirm-${cart.cartList[entry].id}">  
+                                        <div class="col-3">
+                                            <img src="${cart.cartList[entry].item.image}" alt="..."> 
+                                        </div>
+                                        <div class="col">
+                                        <p class="cart-title">${cart.cartList[entry].item.title}</p> 
+                                        <div class="d-flex row justify-content-between">
+                                            <p class="quantity col">Qty: ${cart.cartList[entry].quantity}</p> 
+                                            <p class="col">${currencySymbol[$("#currency").val()]}${convertPrice(cart.cartList[entry].sum,priceModifier).toFixed(2)}</p>
+                                        </div>  
+                                    </div>
+                                </div>`);
+    }
+
+    //taxes are based on the shipping address
+    let country = ($("#ship-country").val()).toUpperCase();
+    let province = $("#ship-province").val();
+
+    //flat rate of $5 for shipping, not converted for currency. Shipping is taxable.
+    $("#confirm-subtotal").html(`${currencySymbol[$("#currency").val()]}${convertPrice(cart.totalPrice, priceModifier).toFixed(2)}`);
+    $("#confirm-shipping").html(`${currencySymbol[$("#currency").val()]}5.00`);
+    $("#confirm-taxes").html(`${currencySymbol[$("#currency").val()]}${((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]).toFixed(2)}`);
+    $("#confirm-total").html(`${currencySymbol[$("#currency").val()]}${(convertPrice(cart.totalPrice, priceModifier) + ((convertPrice(cart.totalPrice, priceModifier) + 5) * taxes[country][province]) + 5).toFixed(2)}`);
+}
+
+//If the currency was updated, redraw three areas that are affected.
+function updateCurrency(){
+    drawCards();
+    drawCart();
+    drawConfirmModal();
+}
+
+//Update the notifier on the cart
+function updateCartNotifier(){
+    if (cart.cartList.length > 0){
+        $("#cart-notifier").html(cart.calculateTotalQuantity());
+        $("#cart-notifier").fadeIn(2000);
+    } else {
+        $("#cart-notifier").fadeOut(2000);
+    }
+}
+
+/*****************************************************************/
+/********** Functions for Converting/Checking Operations *********/
+/*****************************************************************/
+
+//Returns a price based on the CAD price * the current conversion ratio
+function convertPrice(original, modifier){
+    return parseFloat((original * modifier).toFixed(2));
+}
+
+//Validates a regular expression against a string
+function validateField(expression, string){
+    expression = new RegExp(expression);
+    string = string.trim();
+
+    if(expression.test(string)){
+        return true;
+    }
+    return false;
+}
+
+/*****************************************************************/
+/****************** Functions for Button Operations **************/
+/*****************************************************************/
+
+//Function for checkout button in cart
+function checkout(){
+        //don't draw final modal here. Needs tax info, which might not be set.
+        $(".tab-pane.show").removeClass("show active");
+        $(".nav-link.active").removeClass("active").attr("selected", "false");
+        $(".tab-pane#payment").addClass("show active");
+        $(".nav-link#payment-tab").addClass("active").attr("selected", "true");
+        $("#fail-response").fadeOut(1000);
+        $("#checkout-modal").modal("show");
+}
+
+//Closes the modal; hides error response area
+function closeModal(){
+    $("#checkout-modal").modal("hide");
+    $("#fail-response").fadeOut(1000);
+}
+
+//modal prev-next buttons
+function paymentNext(){
+    let verificationPassed = true;
+    let ccNumberRegex = "^[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s-.]*[0-9]{4}[\\s]*$";
+    let ccCVCRegex = "(^[0-9]{3}$)";
+    let ccExpiryRegex = "^[0-9]{2}$";
+    let fadeSpeed = 500;
+
+    //If the credit card field is not valid
+    if (!validateField(ccNumberRegex, $("#cc-number").val())){
+        $("#cc-number-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#cc-number-feedback").fadeOut(fadeSpeed);
+    }
+
+    //If the CVC field is not valid
+    if (!validateField(ccCVCRegex, $("#cc-cvc").val())){
+        $("#cc-cvc-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#cc-cvc-feedback").fadeOut(fadeSpeed);
+    }
+
+    //If the Expiry fields are not valid
+    if (!validateField(ccExpiryRegex, $("#cc-month").val()) || !validateField(ccExpiryRegex, $("#cc-year").val()) || 
+        new Date(`20${$("#cc-year").val()}`, $("#cc-month").val()) < new Date()){
+        $("#cc-expiry-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#cc-expiry-feedback").fadeOut(fadeSpeed);
+    }
+
+
+    if (verificationPassed){
+        $("#payment").removeClass("show active");
+        $("#billing").addClass("show active");
+        $("#payment-tab").removeClass("active").attr("selected", "false");
+        $("#billing-tab").addClass("active").attr("selected", "true");
+    }
+}
+
+function billingPrev(){
+    $("#billing").removeClass("show active");
+    $("#payment").addClass("show active");
+    $("#billing-tab").removeClass("active").attr("selected", "false");
+    $("#payment-tab").addClass("active").attr("selected", "true");
+}
+
+function billingNext(){
+    let verificationPassed = true;
+    let nameRegex = "^[A-Za-z\\s-]+[a-z]+$";
+    let aptRegex = "^[0-9A-Za-z]*$";
+    let numberRegex = "^[0-9]+[A-Z]*$";
+    let wordRegex = "^[A-Za-z\\s-\.-]+[A-Za-z]+$";
+    let postalRegex;
+    if ($("#bill-country").val() == "CA")
+        postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+    else 
+        postalRegex = "^[0-9]{5}$";
+    let emailRegex = "^[0-9A-Za-z\\._-]+@[0-9A-Za-z\\._-]+\\.[0-9A-Za-z\\._-]+$";
+    let phoneRegex = "^[0-9]{3}[\\.\\s-]*[0-9]{3}[\\.\\s-]*[0-9]{4}$";
+    let fadeSpeed = 500;
+
+    //check email field
+    if (!validateField(emailRegex, $("#bill-email").val())){
+        $("#bill-email-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-email-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check phone field
+    if (!validateField(phoneRegex, $("#bill-phone").val())){
+        $("#bill-phone-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-phone-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check first name field
+    if (!validateField(nameRegex, $("#bill-fname").val())){
+        $("#bill-fname-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-fname-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check last name field
+    if (!validateField(nameRegex, $("#bill-lname").val())){
+        $("#bill-lname-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-lname-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check apt field
+    if (!validateField(aptRegex, $("#bill-apt").val())){
+        $("#bill-apt-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-apt-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check house number field
+    if (!validateField(numberRegex, $("#bill-housenumber").val())){
+        $("#bill-housenumber-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-housenumber-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check street field
+    if (!validateField(wordRegex, $("#bill-street").val())){
+        $("#bill-street-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-street-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check city field
+    if (!validateField(wordRegex, $("#bill-city").val())){
+        $("#bill-city-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-city-feedback").fadeOut(fadeSpeed);
+    }
+
+     //check if province was selected
+     if ($("#bill-province").val() == null){
+        $("#bill-province-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-province-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check if country was selected
+    if ($("#bill-country").val() == null){
+        $("#bill-country-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-country-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check postal field
+    if (!validateField(postalRegex, $("#bill-postal").val().toUpperCase())){
+        $("#bill-postal-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#bill-postal-feedback").fadeOut(fadeSpeed);
+    }
+
+    if (verificationPassed){
+        $("#billing").removeClass("show active");
+        $("#shipping").addClass("show active");
+        $("#billing-tab").removeClass("active").attr("selected", "false");
+        $("#shipping-tab").addClass("active").attr("selected", "true");
+        billToShipCheckbox();
+    }
+}
+
+function shippingPrev(){
+    $("#shipping").removeClass("show active");
+    $("#billing").addClass("show active");
+    $("#shipping-tab").removeClass("active").attr("selected", "false");
+    $("#billing-tab").addClass("active").attr("selected", "true");
+    //reset checkbox and values of shipping page
+    $("#same-shipping").prop("checked", false);
+    billToShipCheckbox();
+}
+
+function shippingNext(){
+
+    let verificationPassed = true;
+    let nameRegex = "^[A-Za-z\\s-]+[a-z]+$";
+    let aptRegex = "^[0-9A-Za-z]*$";
+    let numberRegex = "^[0-9]+[A-Z]*$";
+    let wordRegex = "^[A-Za-z\\s-\.-]+[A-Za-z]+$";
+    let postalRegex;
+    if ($("#bill-country").val() == "CA")
+        postalRegex = "^[ABCEGHJKLMNPRSTVXY][0-9][ABCEGHJKLMNPRSTVWXYZ][\\s]*[0-9][ABCEGHJKLMNPRSTVWXYZ][0-9]$";
+    else 
+        postalRegex = "^[0-9]{5}$";
+    let fadeSpeed = 500;
+    
+    //check first name field
+    if (!validateField(nameRegex, $("#ship-fname").val())){
+        $("#ship-fname-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-fname-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check last name field
+    if (!validateField(nameRegex, $("#ship-lname").val())){
+        $("#ship-lname-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-lname-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check apt field
+    if (!validateField(aptRegex, $("#ship-apt").val())){
+        $("#ship-apt-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-apt-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check house number field
+    if (!validateField(numberRegex, $("#ship-housenumber").val())){
+        $("#ship-housenumber-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-housenumber-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check street field
+    if (!validateField(wordRegex, $("#ship-street").val())){
+        $("#ship-street-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-street-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check city field
+    if (!validateField(wordRegex, $("#ship-city").val())){
+        $("#ship-city-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-city-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check if province was selected
+    if ($("#ship-province").val() == null){
+        $("#ship-province-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-province-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check if country was selected
+    if ($("#ship-country").val() == null){
+        $("#ship-country-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-country-feedback").fadeOut(fadeSpeed);
+    }
+
+    //check postal field
+    if (!validateField(postalRegex, $("#ship-postal").val().toUpperCase())){
+        $("#ship-postal-feedback").fadeIn(fadeSpeed);
+        verificationPassed = false;
+    } else {
+        $("#ship-postal-feedback").fadeOut(fadeSpeed);
+    }
+
+    if (verificationPassed){
+        drawConfirmModal();
+        $("#shipping").removeClass("show active");
+        $("#confirm").addClass("show active");
+        $("#shipping-tab").removeClass("active").attr("selected", "false");
+        $("#confirm-tab").addClass("active").attr("selected", "true");
+    }
+}
+
+function confirmPrev(){
+    $("#confirm").removeClass("show active");
+    $("#shipping").addClass("show active");
+    $("#confirm-tab").removeClass("active").attr("selected", "false");
+    $("#shipping-tab").addClass("active").attr("selected", "true");
+    $("#fail-response").fadeOut(1000);
+}
+
+function confirmFinal(){
+    //time to submit json data
+    sendData();
+}
+
+/*****************************************************************/
+/*************** Functions for Returning Local Data **************/
+/*****************************************************************/
+
+//Returns an object for referencing taxes.
 function buildTaxData(){
     let taxData = {
         CA: {
@@ -782,6 +894,7 @@ function buildTaxData(){
     return taxData;
 }
 
+//Returns an object for referencing currency symbols.
 function buildCurrencySymbols(){
     let symbols = {
         cad:"$",
@@ -791,13 +904,87 @@ function buildCurrencySymbols(){
     return symbols;
 }
 
-function updateCurrency(){
-    console.log("in update")
-    drawCards();
-    drawCart();
-    drawConfirmModal();
+//Returns html for provinces
+function getProvinces(){
+    let html = "<option value=\"AB\">AB</option>\
+                <option value=\"BC\">BC</option>\
+                <option value=\"MB\">MB</option>\
+                <option value=\"NB\">NB</option>\
+                <option value=\"NL\">NL</option>\
+                <option value=\"NS\">NS</option>\
+                <option value=\"NT\">NT</option>\
+                <option value=\"NU\">NU</option>\
+                <option value=\"ON\">ON</option>\
+                <option value=\"PE\">PE</option>\
+                <option value=\"QC\">QC</option>\
+                <option value=\"SK\">SK</option>\
+                <option value=\"YT\">YT</option>";
+    return html;
 }
 
+//Returns html for states
+function getStates(){
+    let html = "<option value=\"AL\">AL</option> \
+                <option value=\"AK\">AK</option> \
+                <option value=\"AR\">AR</option> \
+                <option value=\"AZ\">AZ</option> \
+                <option value=\"CA\">CA</option> \
+                <option value=\"CO\">CO</option> \
+                <option value=\"CT\">CT</option> \
+                <option value=\"DE\">DE</option> \
+                <option value=\"DC\">DC</option> \
+                <option value=\"FL\">FL</option> \
+                <option value=\"GA\">GA</option> \
+                <option value=\"HI\">HI</option> \
+                <option value=\"ID\">ID</option> \
+                <option value=\"IL\">IL</option> \
+                <option value=\"IN\">IN</option> \
+                <option value=\"IA\">IA</option> \
+                <option value=\"KS\">KS</option> \
+                <option value=\"KY\">KY</option> \
+                <option value=\"LA\">LA</option> \
+                <option value=\"MA\">MA</option> \
+                <option value=\"MD\">MD</option> \
+                <option value=\"ME\">ME</option> \
+                <option value=\"MI\">MI</option> \
+                <option value=\"MN\">MN</option> \
+                <option value=\"MO\">MO</option> \
+                <option value=\"MS\">MS</option> \
+                <option value=\"MT\">MT</option> \
+                <option value=\"NC\">NC</option> \
+                <option value=\"ND\">ND</option> \
+                <option value=\"NE\">NE</option> \
+                <option value=\"NH\">NH</option> \
+                <option value=\"NJ\">NJ</option> \
+                <option value=\"NM\">NM</option> \
+                <option value=\"NV\">NV</option> \
+                <option value=\"NY\">NY</option> \
+                <option value=\"OH\">OH</option> \
+                <option value=\"OK\">OK</option> \
+                <option value=\"OR\">OR</option> \
+                <option value=\"PA\">PA</option> \
+                <option value=\"RI\">RI</option> \
+                <option value=\"SC\">SC</option> \
+                <option value=\"SD\">SD</option> \
+                <option value=\"TN\">TN</option> \
+                <option value=\"TX\">TX</option> \
+                <option value=\"UT\">UT</option> \
+                <option value=\"VA\">VA</option> \
+                <option value=\"VT\">VT</option> \
+                <option value=\"WA\">WA</option> \
+                <option value=\"WI\">WI</option> \
+                <option value=\"WV\">WV</option> \
+                <option value=\"WY\">WY</option>";
+    return html;
+}
+
+
+
+/**********************************************************************/
+/*************** Functions for Reacting to Field Changes **************/
+/**********************************************************************/
+
+//Called when Bill Province field changes.
 function billingProvinceChange(){
     //potentially copy new values to shipping if they are linked
     //will need to call shippingLocationChange as well in that case
@@ -807,78 +994,17 @@ function billingProvinceChange(){
     }
 }
 
+//Update province field based on Country selection. Triggered when country changes.
 function billingCountryChange(){
     //update provinces list with new list
     switch ($("#bill-country").val()){
         case "CA":
-            $("#bill-province").html("<option value=\"AB\">AB</option>\
-                                    <option value=\"BC\">BC</option>\
-                                    <option value=\"MB\">MB</option>\
-                                    <option value=\"NB\">NB</option>\
-                                    <option value=\"NL\">NL</option>\
-                                    <option value=\"NS\">NS</option>\
-                                    <option value=\"NT\">NT</option>\
-                                    <option value=\"NU\">NU</option>\
-                                    <option value=\"ON\">ON</option>\
-                                    <option value=\"PE\">PE</option>\
-                                    <option value=\"QC\">QC</option>\
-                                    <option value=\"SK\">SK</option>\
-                                    <option value=\"YT\">YT</option>");
+            $("#bill-province").html(getProvinces());
             $("#bill-province-label").html("Province");
             $("#bill-postal-label").html("Postal Code");
             break;
         case "US":
-            $("#bill-province").html("<option value=\"AL\">AL</option> \
-                                    <option value=\"AK\">AK</option> \
-                                    <option value=\"AR\">AR</option> \
-                                    <option value=\"AZ\">AZ</option> \
-                                    <option value=\"CA\">CA</option> \
-                                    <option value=\"CO\">CO</option> \
-                                    <option value=\"CT\">CT</option> \
-                                    <option value=\"DE\">DE</option> \
-                                    <option value=\"DC\">DC</option> \
-                                    <option value=\"FL\">FL</option> \
-                                    <option value=\"GA\">GA</option> \
-                                    <option value=\"HI\">HI</option> \
-                                    <option value=\"ID\">ID</option> \
-                                    <option value=\"IL\">IL</option> \
-                                    <option value=\"IN\">IN</option> \
-                                    <option value=\"IA\">IA</option> \
-                                    <option value=\"KS\">KS</option> \
-                                    <option value=\"KY\">KY</option> \
-                                    <option value=\"LA\">LA</option> \
-                                    <option value=\"MA\">MA</option> \
-                                    <option value=\"MD\">MD</option> \
-                                    <option value=\"ME\">ME</option> \
-                                    <option value=\"MI\">MI</option> \
-                                    <option value=\"MN\">MN</option> \
-                                    <option value=\"MO\">MO</option> \
-                                    <option value=\"MS\">MS</option> \
-                                    <option value=\"MT\">MT</option> \
-                                    <option value=\"NC\">NC</option> \
-                                    <option value=\"ND\">ND</option> \
-                                    <option value=\"NE\">NE</option> \
-                                    <option value=\"NH\">NH</option> \
-                                    <option value=\"NJ\">NJ</option> \
-                                    <option value=\"NM\">NM</option> \
-                                    <option value=\"NV\">NV</option> \
-                                    <option value=\"NY\">NY</option> \
-                                    <option value=\"OH\">OH</option> \
-                                    <option value=\"OK\">OK</option> \
-                                    <option value=\"OR\">OR</option> \
-                                    <option value=\"PA\">PA</option> \
-                                    <option value=\"RI\">RI</option> \
-                                    <option value=\"SC\">SC</option> \
-                                    <option value=\"SD\">SD</option> \
-                                    <option value=\"TN\">TN</option> \
-                                    <option value=\"TX\">TX</option> \
-                                    <option value=\"UT\">UT</option> \
-                                    <option value=\"VA\">VA</option> \
-                                    <option value=\"VT\">VT</option> \
-                                    <option value=\"WA\">WA</option> \
-                                    <option value=\"WI\">WI</option> \
-                                    <option value=\"WV\">WV</option> \
-                                    <option value=\"WY\">WY</option>");
+            $("#bill-province").html(getStates());
             $("#bill-province-label").html("State");
             $("#bill-postal-label").html("ZIP Code");
             break;
@@ -892,90 +1018,31 @@ function billingCountryChange(){
 }
 
 function shippingProvinceChange(){
-    //redraw confirm area because taxes have changed
+    //Redraw confirm area because taxes have changed
     drawConfirmModal();
 }
 
 function shippingCountryChange(){
-    //update provinces list with new list
+    //Update provinces list with new list based on country selection
     switch ($("#ship-country").val()){
         case "CA":
-            $("#ship-province").html("<option value=\"AB\">AB</option>\
-                                    <option value=\"BC\">BC</option>\
-                                    <option value=\"MB\">MB</option>\
-                                    <option value=\"NB\">NB</option>\
-                                    <option value=\"NL\">NL</option>\
-                                    <option value=\"NS\">NS</option>\
-                                    <option value=\"NT\">NT</option>\
-                                    <option value=\"NU\">NU</option>\
-                                    <option value=\"ON\">ON</option>\
-                                    <option value=\"PE\">PE</option>\
-                                    <option value=\"QC\">QC</option>\
-                                    <option value=\"SK\">SK</option>\
-                                    <option value=\"YT\">YT</option>");
+            $("#ship-province").html(getProvinces());
             $("#ship-province-label").html("Province");
             $("#ship-postal-label").html("Postal Code");
             break;
         case "US":
-            $("#ship-province").html("<option value=\"AL\">AL</option> \
-                                    <option value=\"AK\">AK</option> \
-                                    <option value=\"AR\">AR</option> \
-                                    <option value=\"AZ\">AZ</option> \
-                                    <option value=\"CA\">CA</option> \
-                                    <option value=\"CO\">CO</option> \
-                                    <option value=\"CT\">CT</option> \
-                                    <option value=\"DE\">DE</option> \
-                                    <option value=\"DC\">DC</option> \
-                                    <option value=\"FL\">FL</option> \
-                                    <option value=\"GA\">GA</option> \
-                                    <option value=\"HI\">HI</option> \
-                                    <option value=\"ID\">ID</option> \
-                                    <option value=\"IL\">IL</option> \
-                                    <option value=\"IN\">IN</option> \
-                                    <option value=\"IA\">IA</option> \
-                                    <option value=\"KS\">KS</option> \
-                                    <option value=\"KY\">KY</option> \
-                                    <option value=\"LA\">LA</option> \
-                                    <option value=\"MA\">MA</option> \
-                                    <option value=\"MD\">MD</option> \
-                                    <option value=\"ME\">ME</option> \
-                                    <option value=\"MI\">MI</option> \
-                                    <option value=\"MN\">MN</option> \
-                                    <option value=\"MO\">MO</option> \
-                                    <option value=\"MS\">MS</option> \
-                                    <option value=\"MT\">MT</option> \
-                                    <option value=\"NC\">NC</option> \
-                                    <option value=\"ND\">ND</option> \
-                                    <option value=\"NE\">NE</option> \
-                                    <option value=\"NH\">NH</option> \
-                                    <option value=\"NJ\">NJ</option> \
-                                    <option value=\"NM\">NM</option> \
-                                    <option value=\"NV\">NV</option> \
-                                    <option value=\"NY\">NY</option> \
-                                    <option value=\"OH\">OH</option> \
-                                    <option value=\"OK\">OK</option> \
-                                    <option value=\"OR\">OR</option> \
-                                    <option value=\"PA\">PA</option> \
-                                    <option value=\"RI\">RI</option> \
-                                    <option value=\"SC\">SC</option> \
-                                    <option value=\"SD\">SD</option> \
-                                    <option value=\"TN\">TN</option> \
-                                    <option value=\"TX\">TX</option> \
-                                    <option value=\"UT\">UT</option> \
-                                    <option value=\"VA\">VA</option> \
-                                    <option value=\"VT\">VT</option> \
-                                    <option value=\"WA\">WA</option> \
-                                    <option value=\"WI\">WI</option> \
-                                    <option value=\"WV\">WV</option> \
-                                    <option value=\"WY\">WY</option>");
+            $("#ship-province").html(getStates());
             $("#ship-province-label").html("State");
             $("#ship-postal-label").html("ZIP Code");
             break;
     }
 
+    //Must update taxes based on province.
     shippingProvinceChange();
 }
 
+//Activates when the checkbox on the Shipping modal is selected.
+//Copies values from Bill to Ship. Calls change event to make country select activate.
 function billToShipCheckbox(){
     if($("#same-shipping").prop("checked")){
         $("#ship-fname").val($("#bill-fname").val()).prop("disabled", true);
@@ -1001,6 +1068,11 @@ function billToShipCheckbox(){
     }
 }
 
+/*****************************************************************/
+/********************* Functions for Testing *********************/
+/*****************************************************************/
+
+//Fills modal fields with values for easy testing.
 function testFill(){
     //payment
     $("#cc-number").val("4111 1111 1111 1111");
@@ -1026,17 +1098,10 @@ function testFill(){
     billToShipCheckbox();
 }
 
-/*
-after jquery import
-<script src="url for masonry"></script>
 
-$("thing I hold cards in ").imagesLoaded(() => {
-    let mason = new Masonry($("thig I hold cards in"));
-})
-*/
-
-
-/*****  LINEAR CODE STARTS HERE *****/
+/*****************************************************************/
+/******************** LINEAR CODE STARTS HERE ********************/
+/*****************************************************************/
 
 //Create object that holds API calls
 let apis = new JSONHolder();
@@ -1046,9 +1111,14 @@ let cart = new Cart();
 
 //When document is finished loading, do these things:
 $(document).ready(function (){
+    //get the apis and draw the cards
     const getAPI = async () => {
         await getAPICalls();
         drawCards();
+        loadCookie();
+        drawCart();
+        //testing function;
+        testFill();
     };
     getAPI();
     
@@ -1089,23 +1159,14 @@ $(document).ready(function (){
     $("#ship-country").on("change", shippingCountryChange);
     $("#ship-province").on("change", shippingProvinceChange);
 
-    //testing function
-    //testFill();
+    
 });
 
 /* TODO:
 Required:
--closing modal or going back from confirm should hide error response text
--make site look nicer
-    -fix #wall so it displays nicely
-    -stylize wall page
-    -stylize cards
--add comments
 
 
 Extra:
--add notifier to cart icon
--add cookie functionality
 -add animations
 =condense code
 -replace modal tabs with icons
