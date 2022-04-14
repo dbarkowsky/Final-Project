@@ -979,7 +979,6 @@ function getStates(){
 }
 
 
-
 /**********************************************************************/
 /*************** Functions for Reacting to Field Changes **************/
 /**********************************************************************/
@@ -1116,7 +1115,6 @@ $(document).ready(function (){
         await getAPICalls();
         drawCards();
         loadCookie();
-        drawCart();
         //testing function;
         testFill();
     };
